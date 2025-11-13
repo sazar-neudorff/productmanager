@@ -1,5 +1,5 @@
 import ModuleCard from "../components/ModuleCard";
-import "./Home.css";
+import "../styles/Home.css";
 
 export default function Home() {
   return (
