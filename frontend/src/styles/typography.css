@@ -1,0 +1,9 @@
+:root {
+  --font-main: "GillSans", Arial, sans-serif;
+  --font-display: "FrankieNeudorff", Arial, sans-serif;
+  --font-hand: "Caveat", Arial, sans-serif;
+}
+
+h1, h2, h3 {
+  font-family: var(--font-display);
+}

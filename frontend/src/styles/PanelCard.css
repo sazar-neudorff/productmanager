@@ -1,0 +1,7 @@
+.panel-card {
+  background: #fff;
+  border-radius: var(--radius-lg);
+  padding: var(--space-md);
+  box-shadow: var(--shadow-sm);
+  border: 1px solid var(--clr-gray-1);
+}

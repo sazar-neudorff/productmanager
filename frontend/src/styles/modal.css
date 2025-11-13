@@ -1,0 +1,62 @@
+@import "./tokens.css";
+@import "./colors.css";
+@import "./typography.css";
+
+/* Hintergrund-Overlay */
+.modal-overlay {
+  position: fixed;
+  inset: 0;
+  background: rgba(0, 0, 0, 0.45);
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  padding: var(--space-lg);
+  z-index: 999;
+}
+
+/* Modal Box */
+.modal-box {
+  background: #fff;
+  border-radius: var(--radius-lg);
+  padding: var(--space-lg);
+  border: 1px solid var(--clr-gray-2);
+  box-shadow: var(--shadow-md);
+  width: 100%;
+  max-width: 480px;
+  animation: modalFade 0.2s ease-out;
+}
+
+/* Header Text Style */
+.modal-title {
+  font-family: var(--font-display);
+  font-size: 1.6rem;
+  color: var(--clr-primary-2);
+  margin-bottom: var(--space-md);
+}
+
+/* Text */
+.modal-text {
+  font-family: var(--font-main);
+  font-size: 1rem;
+  color: var(--clr-text-main);
+  margin-bottom: var(--space-lg);
+}
+
+/* Button Section */
+.modal-actions {
+  display: flex;
+  justify-content: flex-end;
+  gap: var(--space-md);
+}
+
+/* Animation */
+@keyframes modalFade {
+  from {
+    opacity: 0;
+    transform: translateY(10px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}

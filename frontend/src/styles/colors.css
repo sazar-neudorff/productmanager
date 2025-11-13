@@ -1,0 +1,23 @@
+:root {
+  --clr-primary-1: #3AAA35;
+  --clr-primary-2: #319f49;
+  --clr-primary-3: #267a38;
+
+  --clr-accent-yellow-1: #fffef3;
+  --clr-accent-yellow-2: #fffde5;
+  --clr-accent-yellow-3: #fff8c8;
+  --clr-accent-yellow-4: #ffee50;
+
+  --clr-brown-1: #474030;
+  --clr-brown-2: #46515a;
+
+  --clr-gray-1: #e7eaee;
+  --clr-gray-2: #ddd;
+  --clr-gray-3: #cfd6dc;
+
+  --clr-text-main: #333;
+  --clr-text-muted: #65707a;
+
+  --clr-error: #d32f2f;
+  --clr-error-dark: #c62828;
+}

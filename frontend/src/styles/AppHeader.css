@@ -1,0 +1,42 @@
+@import "../../styles/colors.css";
+@import "../../styles/tokens.css";
+@import "../../styles/typography.css";
+
+.app-header {
+  background: var(--clr-primary-2);
+  color: white;
+  padding: var(--space-md) var(--space-lg);
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+
+.app-title {
+  font-family: var(--font-display);
+  font-size: 1.6rem;
+}
+
+.app-tabs {
+  display: flex;
+  gap: var(--space-md);
+}
+
+.tab {
+  background: transparent;
+  border: none;
+  color: white;
+  padding: var(--space-sm) var(--space-md);
+  font-family: var(--font-main);
+  cursor: pointer;
+  opacity: .9;
+  transition: 0.15s ease;
+}
+
+.tab:hover {
+  opacity: 1;
+}
+
+.tab.active {
+  background: rgba(255,255,255,0.25);
+  border-radius: var(--radius-md);
+}

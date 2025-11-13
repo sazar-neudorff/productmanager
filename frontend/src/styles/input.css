@@ -1,0 +1,37 @@
+@import "./tokens.css";
+@import "./colors.css";
+@import "./typography.css";
+
+.input {
+  width: 100%;
+  padding: var(--space-sm) var(--space-md);
+  border-radius: var(--radius-md);
+  border: 1px solid var(--clr-gray-2);
+  background: #fff;
+  font-family: var(--font-main);
+  font-size: 1rem;
+  color: var(--clr-text-main);
+  transition: border-color 0.15s ease, box-shadow 0.15s ease;
+  outline: none;
+}
+
+.input::placeholder {
+  color: var(--clr-text-muted);
+  opacity: 0.8;
+}
+
+.input:focus {
+  border-color: var(--clr-primary-2);
+  box-shadow: 0 0 0 3px rgba(49, 159, 73, 0.25); /* dein Grün mit Glow */
+}
+
+.input--error {
+  border-color: var(--clr-error);
+  box-shadow: 0 0 0 3px rgba(211, 47, 47, 0.25);
+}
+
+.input--disabled {
+  opacity: 0.7;
+  background: var(--clr-gray-1);
+  cursor: not-allowed;
+}

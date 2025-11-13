@@ -1,0 +1,29 @@
+.action-btn {
+  font-family: var(--font-display);
+  position: relative;
+  padding: 0.8rem 1.6rem;
+  cursor: pointer;
+  border: none;
+  background: transparent;
+}
+
+.action-btn::before {
+  content: "";
+  position: absolute;
+  inset: 0;
+  background-color: var(--clr-primary-2);
+  -webkit-mask: url("/assets/button-bg.svg") no-repeat center / 100%;
+  mask: url("/assets/button-bg.svg") no-repeat center / 100%;
+}
+
+.action-btn--primary::before {
+  background: var(--clr-primary-2);
+}
+
+.action-btn--warning::before {
+  background: var(--clr-accent-yellow-4);
+}
+
+.action-btn:hover::before {
+  filter: brightness(.9);
+}
