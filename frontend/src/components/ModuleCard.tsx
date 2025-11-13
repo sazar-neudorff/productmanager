@@ -1,4 +1,4 @@
-import "../styles/AppHeader.css";
+import "../styles/ModuleCard.css";
 
 interface ModuleCardProps {
   title: string;

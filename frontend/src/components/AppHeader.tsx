@@ -1,4 +1,4 @@
-import "./AppHeader.css";
+import "../styles/AppHeader.css";
 
 export default function AppHeader() {
   return (
