@@ -1,6 +1,6 @@
-@import "../../styles/tokens.css";
-@import "../../styles/colors.css";
-@import "../../styles/typography.css";
+@import "./tokens.css";
+@import "./colors.css";
+@import "./typography.css";
 
 .home-wrapper {
   padding: var(--space-lg);
