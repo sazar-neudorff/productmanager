@@ -1,6 +1,6 @@
-@import "../../styles/colors.css";
-@import "../../styles/tokens.css";
-@import "../../styles/typography.css";
+@import ".styles/colors.css";
+@import ".styles/tokens.css";
+@import ".styles/typography.css";
 
 .app-header {
   background: var(--clr-primary-2);
