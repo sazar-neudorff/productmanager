@@ -1,8 +1,8 @@
 import "../styles/ModuleCard.css";
 
-type ModuleStatus = "stable" | "attention" | "warning";
+export type ModuleStatus = "stable" | "attention" | "warning";
 
-interface ModuleCardProps {
+export interface ModuleCardProps {
   title: string;
   description: string;
   owner: string;

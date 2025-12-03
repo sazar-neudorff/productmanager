@@ -1,4 +1,4 @@
-import ModuleCard from "../components/ModuleCard";
+import ModuleCard, { type ModuleCardProps } from "../components/ModuleCard";
 import "../styles/Home.css";
 
 const highlights = [
@@ -8,7 +8,7 @@ const highlights = [
   { label: "Service-Level", value: "99,2%", delta: "+0,4%", tone: "positive" },
 ];
 
-const modules = [
+const modules: ModuleCardProps[] = [
   {
     title: "Service Hub",
     description: "Priorisierte Vorgänge, Kundenerwartungen & Eskalationen.",
