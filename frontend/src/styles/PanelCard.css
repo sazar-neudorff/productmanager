@@ -1,7 +1,18 @@
+@import "./colors.css";
+@import "./tokens.css";
+
 .panel-card {
-  background: #fff;
+  background: var(--clr-surface-strong);
   border-radius: var(--radius-lg);
-  padding: var(--space-md);
+  padding: var(--space-lg);
   box-shadow: var(--shadow-sm);
-  border: 1px solid var(--clr-gray-1);
+  border: 1px solid var(--clr-border);
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-md);
+}
+
+.panel-card__header h3 {
+  margin: 0;
+  color: var(--clr-text-main);
 }

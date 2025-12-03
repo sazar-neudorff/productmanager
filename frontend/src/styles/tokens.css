@@ -1,13 +1,30 @@
 :root {
+  --radius-xs: 4px;
   --radius-sm: 6px;
-  --radius-md: 8px;
-  --radius-lg: 12px;
+  --radius-md: 10px;
+  --radius-lg: 16px;
+  --radius-pill: 999px;
 
-  --shadow-sm: 0 2px 6px rgba(0,0,0,0.08);
-  --shadow-md: 0 6px 18px rgba(0,0,0,0.1);
+  --shadow-sm: 0 4px 12px rgba(0, 0, 0, 0.06);
+  --shadow-md: 0 12px 32px rgba(15, 23, 42, 0.15);
+  --shadow-lg: 0 30px 60px rgba(12, 18, 32, 0.18);
 
+  --space-xxs: 2px;
   --space-xs: 4px;
   --space-sm: 8px;
   --space-md: 16px;
   --space-lg: 24px;
+  --space-xl: 32px;
+  --space-2xl: 48px;
+
+  --layout-max-width: 1400px;
+  --layout-content-width: 1120px;
+  --sidebar-width: 280px;
+
+  --transition-fast: 120ms ease;
+  --transition-medium: 180ms ease;
+  --transition-slow: 320ms ease;
+
+  --border-width: 1px;
+  --border-width-bold: 2px;
 }
