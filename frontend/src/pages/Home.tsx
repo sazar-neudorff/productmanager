@@ -27,19 +27,19 @@ const heroStats = [
 
 const quickLaunch = [
   {
-    label: "Service Hub öffnen",
-    detail: "Priorisierte Kundenfälle & Eskalationen",
-    action: "Start",
+    label: "Produktliste exportieren",
+    detail: "Obi, Otto, Shopify oder interne Templates",
+    action: "Produktmanagement",
   },
   {
-    label: "Automationen bauen",
-    detail: "Regeln, Trigger & Freigaben konfigurieren",
-    action: "Studio",
+    label: "Bestellung erfassen",
+    detail: "Fachberatung schickt Vorgänge an die Systeme",
+    action: "Fachberatung",
   },
   {
-    label: "Reports teilen",
-    detail: "Forecast & Compliance Kennzahlen",
-    action: "Insights",
+    label: "Neues Modul anfragen",
+    detail: "Zugänge & Anforderungen mit Operations abstimmen",
+    action: "Kontakt",
   },
 ];
 
@@ -65,30 +65,21 @@ type ModuleDefinition = ComponentProps<typeof ModuleCard>;
 
 const modules: ModuleDefinition[] = [
   {
-    title: "Service Hub",
-    description: "Priorisierte Vorgänge, Kundenerwartungen & Eskalationen.",
-    owner: "Kanal: Support",
-    updatedAt: "Aktualisiert vor 12 Min",
-    kpi: { label: "SLA erfüllt", value: "94%" },
-    tags: ["Response", "24/7"],
-    status: "warning",
-  },
-  {
-    title: "Automationen",
-    description: "Flows, Trigger & Freigaben zentral orchestrieren.",
-    owner: "Plattform",
-    updatedAt: "Aktualisiert vor 3 Std",
-    kpi: { label: "Aktive Regeln", value: "56" },
-    tags: ["Workflows", "APIs"],
+    title: "Produktmanagement",
+    description: "Exports & Vorlagen für Obi, Otto, Shopify oder interne Kanäle.",
+    owner: "Team Produkt",
+    updatedAt: "Aktualisiert vor 5 Min",
+    kpi: { label: "Exportprofile", value: "7 aktiv" },
+    tags: ["Obi", "Otto", "Shopify"],
     status: "stable",
   },
   {
-    title: "Insights & Reports",
-    description: "Quartalsziele, Prognosen und Compliance Kennzahlen.",
-    owner: "Reporting",
-    updatedAt: "Aktualisiert gestern",
-    kpi: { label: "Forecast", value: "+8%" },
-    tags: ["BI", "Exports"],
+    title: "Fachberatung",
+    description: "Bestellungen erfassen und sicher in die Backend-Systeme schicken.",
+    owner: "Team Beratung",
+    updatedAt: "Aufbau läuft",
+    kpi: { label: "Anfragen heute", value: "0" },
+    tags: ["Bestellungen", "Interne Tools"],
     status: "attention",
   },
 ];
@@ -137,8 +128,8 @@ export default function Home() {
           <p className="section-heading__eyebrow">Startbereich</p>
           <h2>Operations Plattform</h2>
           <p className="hero-description">
-            Steuerzentrale für interne Teams, Module und Service-Level. Wähle
-            einen Bereich aus oder lege direkt los.
+            Allgemeiner Zugang zur internen Plattform. Starte in einem Modul,
+            um Exporte zu steuern oder Bestellungen für die Teams einzureichen.
           </p>
 
           <div className="hero-stats">
