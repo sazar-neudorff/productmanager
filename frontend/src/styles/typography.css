@@ -1,9 +1,16 @@
 :root {
-  --font-main: "GillSans", Arial, sans-serif;
-  --font-display: "FrankieNeudorff", Arial, sans-serif;
-  --font-hand: "Caveat", Arial, sans-serif;
-}
+  --font-main: "Inter", "Segoe UI", system-ui, -apple-system, BlinkMacSystemFont, sans-serif;
+  --font-display: "Space Grotesk", "Inter", "Segoe UI", system-ui, sans-serif;
+  --font-mono: "IBM Plex Mono", "SFMono-Regular", ui-monospace, monospace;
 
-h1, h2, h3 {
-  font-family: var(--font-display);
+  --font-size-xs: 0.75rem;
+  --font-size-sm: 0.85rem;
+  --font-size-base: 1rem;
+  --font-size-lg: 1.125rem;
+  --font-size-xl: 1.4rem;
+  --font-size-2xl: 1.9rem;
+
+  --line-height-tight: 1.2;
+  --line-height-base: 1.5;
+  --line-height-loose: 1.7;
 }

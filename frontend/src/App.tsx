@@ -1,14 +1,19 @@
 import AppHeader from "./components/AppHeader";
+import PortalSidebar from "./components/PortalSidebar";
 import Home from "./pages/Home";
 
 export default function App() {
   return (
-    <div className="app">
-      <AppHeader />
+    <div className="app-shell">
+      <PortalSidebar />
 
-      <main className="app-content">
-        <Home />
-      </main>
+      <div className="app-main">
+        <AppHeader />
+
+        <main className="app-content">
+          <Home />
+        </main>
+      </div>
     </div>
   );
 }

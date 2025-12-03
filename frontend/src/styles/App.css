@@ -2,21 +2,40 @@
 @import "./tokens.css";
 @import "./typography.css";
 
-/* Gesamte App-Hülle */
-.app {
+.app-shell {
   min-height: 100vh;
   display: flex;
-  flex-direction: column;
-  background: var(--color-background);
-  color: var(--color-text);
+  background: var(--clr-surface);
+  color: var(--clr-text-main);
   font-family: var(--font-main);
 }
 
-/* Bereich für den Seiteninhalt */
+.app-main {
+  flex: 1;
+  min-height: 100vh;
+  display: flex;
+  flex-direction: column;
+  background: var(--clr-surface);
+}
+
 .app-content {
   flex: 1;
-  padding: 2rem;
-  max-width: 1200px;
-  margin: 0 auto;
   width: 100%;
+  max-width: var(--layout-content-width);
+  margin: 0 auto;
+  padding: var(--space-xl) var(--space-2xl);
+}
+
+@media (max-width: 1200px) {
+  .app-shell {
+    flex-direction: column;
+  }
+
+  .app-main {
+    padding-top: var(--space-lg);
+  }
+
+  .app-content {
+    padding: var(--space-lg);
+  }
 }
