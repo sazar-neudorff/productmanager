@@ -1,14 +1,69 @@
+import type { ComponentProps } from "react";
 import ModuleCard from "../components/ModuleCard";
 import "../styles/Home.css";
 
 const highlights = [
-  { label: "Offene Tickets", value: "18", delta: "+3 seit gestern", tone: "warning" },
-  { label: "Automationen aktiv", value: "42", delta: "Stabil", tone: "positive" },
+  {
+    label: "Offene Tickets",
+    value: "18",
+    delta: "+3 seit gestern",
+    tone: "warning",
+  },
+  {
+    label: "Automationen aktiv",
+    value: "42",
+    delta: "Stabil",
+    tone: "positive",
+  },
   { label: "Deployments heute", value: "3", delta: "Planmäßig", tone: "neutral" },
   { label: "Service-Level", value: "99,2%", delta: "+0,4%", tone: "positive" },
 ];
 
-const modules = [
+const heroStats = [
+  { label: "Team", value: "Operations Core", detail: "12 aktiv" },
+  { label: "Integrationen", value: "9", detail: "2 neue Anfragen" },
+  { label: "Nächste Wartung", value: "Do, 14:00", detail: "Cluster West" },
+];
+
+const quickLaunch = [
+  {
+    label: "Service Hub öffnen",
+    detail: "Priorisierte Kundenfälle & Eskalationen",
+    action: "Start",
+  },
+  {
+    label: "Automationen bauen",
+    detail: "Regeln, Trigger & Freigaben konfigurieren",
+    action: "Studio",
+  },
+  {
+    label: "Reports teilen",
+    detail: "Forecast & Compliance Kennzahlen",
+    action: "Insights",
+  },
+];
+
+const watchlist = [
+  {
+    title: "Deploy 2025.12",
+    detail: "Abgleich mit IT · 14:00 Uhr",
+    status: "Bereit",
+  },
+  {
+    title: "Incident Übung",
+    detail: "Runbook aktualisieren · bis Freitag",
+    status: "Review",
+  },
+  {
+    title: "Audit Bericht",
+    detail: "Feedback Legal · nächste Woche",
+    status: "Entwurf",
+  },
+];
+
+type ModuleDefinition = ComponentProps<typeof ModuleCard>;
+
+const modules: ModuleDefinition[] = [
   {
     title: "Service Hub",
     description: "Priorisierte Vorgänge, Kundenerwartungen & Eskalationen.",
@@ -77,6 +132,84 @@ const activities = [
 export default function Home() {
   return (
     <div className="dashboard">
+      <section className="dashboard-hero">
+        <div className="hero-main">
+          <p className="section-heading__eyebrow">Startbereich</p>
+          <h2>Operations Plattform</h2>
+          <p className="hero-description">
+            Steuerzentrale für interne Teams, Module und Service-Level. Wähle
+            einen Bereich aus oder lege direkt los.
+          </p>
+
+          <div className="hero-stats">
+            {heroStats.map((stat) => (
+              <div key={stat.label} className="hero-stat">
+                <span className="hero-stat__label">{stat.label}</span>
+                <strong className="hero-stat__value">{stat.value}</strong>
+                <span className="hero-stat__detail">{stat.detail}</span>
+              </div>
+            ))}
+          </div>
+
+          <div className="hero-actions">
+            <button type="button" className="workspace-action workspace-action--primary">
+              Neuer Vorgang
+            </button>
+            <button type="button" className="workspace-action workspace-action--ghost">
+              Start Check-in
+            </button>
+          </div>
+        </div>
+
+        <div className="hero-panels">
+          <div className="hero-panel">
+            <div className="hero-panel__header">
+              <p>Quick Launch</p>
+              <button
+                type="button"
+                className="workspace-action workspace-action--ghost"
+                aria-label="Quick Launch anpassen"
+              >
+                Anpassen
+              </button>
+            </div>
+
+            <ul className="quick-launch">
+              {quickLaunch.map((item) => (
+                <li key={item.label} className="quick-launch__item">
+                  <div>
+                    <p className="quick-launch__label">{item.label}</p>
+                    <p className="quick-launch__detail">{item.detail}</p>
+                  </div>
+                  <button type="button" className="quick-launch__action">
+                    {item.action}
+                  </button>
+                </li>
+              ))}
+            </ul>
+          </div>
+
+          <div className="hero-panel">
+            <div className="hero-panel__header">
+              <p>Beobachtungsliste</p>
+              <span>Heute</span>
+            </div>
+
+            <ul className="watchlist">
+              {watchlist.map((item) => (
+                <li key={item.title} className="watchlist__item">
+                  <div>
+                    <p className="watchlist__title">{item.title}</p>
+                    <p className="watchlist__meta">{item.detail}</p>
+                  </div>
+                  <span className="watchlist__status">{item.status}</span>
+                </li>
+              ))}
+            </ul>
+          </div>
+        </div>
+      </section>
+
       <section className="dashboard-section">
         <div className="section-heading">
           <div>
