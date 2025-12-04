@@ -27,7 +27,7 @@ const stats = [
 
 export default function PortalSidebar() {
   return (
-    <aside className="portal-sidebar" aria-label="Seitennavigation">
+    <aside className="portal-sidebar admin-sidebar" aria-label="Seitennavigation">
       <div className="portal-sidebar__brand">
         <div className="portal-sidebar__badge">Neudorff</div>
         <p className="portal-sidebar__tagline">Interne Plattform</p>

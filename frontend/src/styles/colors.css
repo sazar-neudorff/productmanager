@@ -15,6 +15,7 @@
   --clr-earth-brown: #474030;
   --clr-badge-pink: #ffe3f1;
   --clr-badge-pink-text: #b83280;
+  --clr-background-base: #f4f4f4;
 
   --clr-gray-0: #fffef8;
   --clr-gray-1: #f7f3e8;
@@ -26,16 +27,16 @@
   --clr-surface: #fffef3;
   --clr-surface-strong: #ffffff;
   --clr-surface-muted: #fff8e6;
-  --clr-surface-accent: linear-gradient(140deg, #ffee50 0%, #ffe08a 45%, #fffaf1 100%);
+  --clr-surface-accent: linear-gradient(180deg, #ffee50 0%, #fffef3 70%, #ffffff 100%);
 
   --clr-border: rgba(71, 64, 48, 0.15);
   --clr-border-strong: rgba(71, 64, 48, 0.3);
 
-  --clr-text-main: #23333a;
-  --clr-text-muted: #5c6152;
-  --clr-text-subtle: #7a7159;
+  --clr-text-main: #474030;
+  --clr-text-muted: #66615a;
+  --clr-text-subtle: #7a6d54;
   --clr-text-inverse: #ffffff;
-  --clr-heading: #23333a;
+  --clr-heading: #319f49;
 
   --clr-success: #319f49;
   --clr-success-muted: #e6f4ea;
