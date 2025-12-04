@@ -16,15 +16,15 @@
 }
 
 .module-card--green {
-  background: linear-gradient(150deg, #e6f4ea 0%, #fffef3 70%);
+  background: linear-gradient(180deg, #e6f4ea 0%, #fffef3 90%);
 }
 
 .module-card--yellow {
-  background: linear-gradient(155deg, #fff4c7 0%, #fffef3 70%);
+  background: linear-gradient(180deg, #ffee50 0%, #fffef3 100%);
 }
 
 .module-card--brown {
-  background: linear-gradient(150deg, #f0ece4 0%, #fffef3 70%);
+  background: linear-gradient(180deg, #f0ece4 0%, #fffef3 95%);
 }
 
 .module-card:hover {
