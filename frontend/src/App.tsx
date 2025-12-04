@@ -2,6 +2,7 @@ import { useMemo, useState } from "react";
 import PortalSidebar from "./components/PortalSidebar";
 import Home from "./pages/Home";
 import ProductManagementPage from "./pages/ProductManagementPage";
+import BestellCockpitPage from "./pages/BestellCockpitPage";
 
 type ViewId = "home" | "product-management" | "nuetzlingsportal" | "bestell-cockpit";
 
@@ -33,10 +34,11 @@ export default function App() {
     switch (activeView) {
       case "product-management":
         return <ProductManagementPage />;
+      case "bestell-cockpit":
+        return <BestellCockpitPage />;
       case "home":
         return <Home onSelectModule={handleModuleSelect} />;
       case "nuetzlingsportal":
-      case "bestell-cockpit":
       default:
         return (
           <div className="placeholder-view">
