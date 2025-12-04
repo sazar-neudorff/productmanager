@@ -6,8 +6,6 @@
   min-height: 100vh;
   width: 100%;
   display: flex;
-  justify-content: center;
-  padding: clamp(1rem, 3vw, 2.5rem);
   background: var(--clr-background-base);
   color: var(--clr-text-main);
   font-family: var(--font-main);
@@ -19,8 +17,8 @@
 .app-shell::after {
   content: "";
   position: absolute;
-  width: 480px;
-  height: 480px;
+  width: 520px;
+  height: 520px;
   background: radial-gradient(circle, rgba(255, 232, 120, 0.18), transparent 70%);
   z-index: 0;
   pointer-events: none;
@@ -36,69 +34,29 @@
   left: -90px;
 }
 
-.admin-container {
+.app-main {
   position: relative;
   z-index: 1;
-  display: flex;
-  width: 100%;
-  max-width: 1480px;
-  min-height: calc(100vh - clamp(2rem, 6vw, 4rem));
-  background: #ffffff;
-  border-radius: 28px;
-  box-shadow: 0 20px 55px rgba(0, 0, 0, 0.08);
-  overflow: hidden;
-  border: 1px solid rgba(71, 64, 48, 0.08);
-}
-
-.app-main {
   flex: 1;
-  min-height: 100%;
+  min-height: 100vh;
   display: flex;
   flex-direction: column;
   background: linear-gradient(180deg, #fffef3 0%, #ffffff 100%);
-}
-
-.admin-content {
-  position: relative;
-  flex: 1;
   overflow: auto;
-}
-
-.admin-content__inner {
-  min-height: 100%;
-  display: flex;
-  flex-direction: column;
-  padding: clamp(1.5rem, 2vw, 2.75rem);
-  background: linear-gradient(180deg, #fffef3 0%, #ffffff 55%);
 }
 
 .app-content {
   flex: 1;
   width: 100%;
-  margin: 0 auto;
-  margin-top: var(--space-xl);
-  padding: clamp(1.5rem, 2.5vw, 3rem);
-  background: #ffffff;
-  border-radius: 24px;
-  border: 1px solid rgba(71, 64, 48, 0.1);
-  box-shadow: 0 25px 60px rgba(0, 0, 0, 0.08);
+  padding: clamp(1.5rem, 3vw, 4rem);
 }
 
 @media (max-width: 1200px) {
   .app-shell {
-    padding: 0;
-  }
-
-  .admin-container {
     flex-direction: column;
-    border-radius: 0;
   }
 
-  .admin-content__inner {
-    padding: var(--space-lg);
-  }
-
-  .app-content {
-    padding: var(--space-lg);
+  .app-main {
+    min-height: auto;
   }
 }

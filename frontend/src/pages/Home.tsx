@@ -3,30 +3,10 @@ import ModuleCard from "../components/ModuleCard";
 import "../styles/Home.css";
 
 const modules: ComponentProps<typeof ModuleCard>[] = [
-  {
-    title: "Nützlingsportal Admin",
-    owner: "Team Gartenbau",
-    updatedAt: "Letztes Update · 09:42",
-    kpi: { label: "Aktive Codes", value: "128" },
-    tags: ["Nützlinge", "Admin"],
-    status: "stable",
-  },
-  {
-    title: "Produktmanagement",
-    owner: "Team Produkt",
-    updatedAt: "Aktualisiert vor 5 Min",
-    kpi: { label: "Exportprofile", value: "7 aktiv" },
-    tags: ["Obi", "Otto", "Shopify"],
-    status: "stable",
-  },
-  {
-    title: "Bestell Cockpit",
-    owner: "Team Beratung",
-    updatedAt: "Aufbau läuft",
-    kpi: { label: "Anfragen heute", value: "0" },
-    tags: ["Bestellungen", "Interne Tools"],
-    status: "attention",
-  },
+  { title: "Nützlingsportal Admin", caption: "Codes & Pflege", accent: "green" },
+  { title: "Produktmanagement", caption: "Daten & Assets", accent: "yellow" },
+  { title: "Bestell Cockpit", caption: "Aufträge & Routing", accent: "brown" },
+  { title: "Kanäle & Händler", caption: "Exporte koordinieren", accent: "green" },
 ];
 
 export default function Home() {
@@ -37,12 +17,11 @@ export default function Home() {
           <p className="section-heading__eyebrow">Startbereich</p>
           <h2>Neudorff Plattform</h2>
           <p className="hero-description">
-            Allgemeiner Zugang zur internen Plattform. Starte in einem Modul, um
-            Codes zu verwalten, Exporte zu steuern oder Bestellungen für die Teams
-            einzureichen.
+            Ein gemeinsamer Zugang für alle Werkzeuge, die ihr täglich im Portal
+            braucht. Wähle einen Bereich aus und du landest direkt in der
+            passenden App.
           </p>
           <p className="hero-handwriting">Alles für das Nützlingsportal an einem Ort.</p>
-
         </div>
       </section>
 
