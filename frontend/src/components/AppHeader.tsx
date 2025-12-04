@@ -5,9 +5,9 @@ const tabs = [{ label: "Dashboard", isActive: true }];
 export default function AppHeader() {
   return (
     <header className="workspace-header">
-      <div className="workspace-header__main">
+      <div className="workspace-header__main workspace-header__main--compact">
         <div>
-          <p className="workspace-header__eyebrow">Neodoff Plattform</p>
+          <p className="workspace-header__eyebrow">Neudorff Plattform</p>
           <h1>Dashboard</h1>
           <p className="workspace-header__description">
             Übersicht über die verfügbaren Module. Wähle einen Bereich, um mit
