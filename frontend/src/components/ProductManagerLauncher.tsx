@@ -2,6 +2,9 @@ import { useMemo, useState } from "react";
 import type { ReactNode } from "react";
 import "../styles/ProductManager.css";
 import NeudorffTab from "./productManager/NeudorffTab";
+import ShopifyTab from "./productManager/ShopifyTab";
+import ObiTab from "./productManager/ObiTab";
+import BauhausTab from "./productManager/BauhausTab";
 
 type SubTab = {
   id: string;
@@ -42,7 +45,7 @@ const MAIN_TABS: MainTab[] = [
         description:
           "Shopify-spezifische Produktansichten inklusive Assets, Preise und Verfügbarkeiten.",
         meta: "Shop Daten",
-        tasks: ["Shop-Mapping öffnen", "Varianten prüfen", "Assets synchronisieren"],
+        component: <ShopifyTab />,
       },
       {
         id: "obi",
@@ -51,7 +54,7 @@ const MAIN_TABS: MainTab[] = [
         description:
           "Exportprofile und Pflichtfelder für OBI. Enthält Freigaben und Kontrolllisten.",
         meta: "OBI Export",
-        tasks: ["Exportprofil wählen", "Pflichtfelder checken", "Datei generieren"],
+        component: <ObiTab />,
       },
       {
         id: "bauhaus",
@@ -60,41 +63,7 @@ const MAIN_TABS: MainTab[] = [
         description:
           "Bauhaus Routing inkl. Bebilderung und Attribut-Templates für Sortiment A/B.",
         meta: "Templates",
-        tasks: ["Template öffnen", "Attribute ergänzen", "Export kontrollieren"],
-      },
-    ],
-  },
-  {
-    id: "files",
-    label: "Datei Management",
-    description: "Bild- und Dateiumbenennungen für Partnerkanäle.",
-    subTabs: [
-      {
-        id: "image-obi",
-        label: "Bild Umbenennen · OBI",
-        eyebrow: "Bildfluss",
-        description:
-          "Automatische Benennung für OBI-Standards (SKU + Perspektive). Drag & Drop möglich.",
-        meta: "OBI Bilder",
-        tasks: ["Ordner wählen", "Vorschau checken", "Benennen starten"],
-      },
-      {
-        id: "image-hagebau",
-        label: "Bild Umbenennen · Hagebau",
-        eyebrow: "Bildfluss",
-        description:
-          "Schnelles Umbenennen nach Hagebau-Richtlinien inklusive Größenprüfung.",
-        meta: "Hagebau",
-        tasks: ["Quelldateien prüfen", "Namensschema anwenden", "Upload vorbereiten"],
-      },
-      {
-        id: "file-renamer",
-        label: "Datei Umbenennen · Renamer",
-        eyebrow: "Dateien",
-        description:
-          "Batch-Renamer für generische Dateien. Ideal für ZIPs, PDFs oder Datenblätter.",
-        meta: "Allgemein",
-        tasks: ["Mapping definieren", "Review fahren", "Export speichern"],
+        component: <BauhausTab />,
       },
     ],
   },
@@ -102,6 +71,7 @@ const MAIN_TABS: MainTab[] = [
 
 export default function ProductManagerLauncher() {
   const [activeMainTab, setActiveMainTab] = useState<string>(MAIN_TABS[0].id);
+  const hasMultipleMainTabs = MAIN_TABS.length > 1;
   const initialSubSelections = useMemo(
     () =>
       MAIN_TABS.reduce<Record<string, string>>((acc, tab) => {
@@ -142,23 +112,25 @@ export default function ProductManagerLauncher() {
         </div>
       </header>
 
-      <div className="product-launcher__main-tabs" role="tablist" aria-label="Launcher Bereiche">
-        {MAIN_TABS.map((tab) => (
-          <button
-            key={tab.id}
-            type="button"
-            role="tab"
-            aria-selected={activeMainTab === tab.id}
-            className={`product-launcher__main-tab ${
-              activeMainTab === tab.id ? "is-active" : ""
-            }`.trim()}
-            onClick={() => setActiveMainTab(tab.id)}
-          >
-            <span className="product-launcher__main-tab-label">{tab.label}</span>
-            <span className="product-launcher__main-tab-hint">{tab.description}</span>
-          </button>
-        ))}
-      </div>
+      {hasMultipleMainTabs && (
+        <div className="product-launcher__main-tabs" role="tablist" aria-label="Launcher Bereiche">
+          {MAIN_TABS.map((tab) => (
+            <button
+              key={tab.id}
+              type="button"
+              role="tab"
+              aria-selected={activeMainTab === tab.id}
+              className={`product-launcher__main-tab ${
+                activeMainTab === tab.id ? "is-active" : ""
+              }`.trim()}
+              onClick={() => setActiveMainTab(tab.id)}
+            >
+              <span className="product-launcher__main-tab-label">{tab.label}</span>
+              <span className="product-launcher__main-tab-hint">{tab.description}</span>
+            </button>
+          ))}
+        </div>
+      )}
 
       <div className="product-launcher__body">
         <div

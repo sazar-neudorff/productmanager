@@ -1,47 +1,45 @@
 import "../styles/Sidebar.css";
 
-const navigation = [
-  {
-    label: "Nützlingsportal Admin",
-    description: "Codes & Pflege",
-    isActive: true,
-  },
-  {
-    label: "Bestell Cockpit",
-    description: "Kanäle & Händler",
-  },
-  {
-    label: "Produktmanagement",
-    description: "Exporte & Sets",
-  },
-];
+type SidebarNavItem = {
+  id: string;
+  label: string;
+  description: string;
+};
 
-export default function PortalSidebar() {
+interface PortalSidebarProps {
+  navigation: SidebarNavItem[];
+  activeView: string;
+  onNavigate: (id: SidebarNavItem["id"]) => void;
+}
+
+export default function PortalSidebar({ navigation, activeView, onNavigate }: PortalSidebarProps) {
   return (
     <aside className="portal-sidebar admin-sidebar" aria-label="Seitennavigation">
       <div className="portal-sidebar__brand">
         <div className="portal-sidebar__badge">Neudorff</div>
         <p className="portal-sidebar__tagline">Interne Plattform</p>
-        <h2>Nützlingsportal Admin</h2>
-        <p>Pflege der Nützlings-Bestände</p>
+        <h2>Produktmanager</h2>
+        <p>Module, Exporte und Dateiflüsse in einer Oberfläche.</p>
       </div>
 
       <nav className="portal-sidebar__nav" aria-label="Hauptnavigation">
-        {navigation.map((item) => (
-          <button
-            key={item.label}
-            type="button"
-            className={`sidebar-link ${item.isActive ? "is-active" : ""}`}
-            aria-current={item.isActive ? "page" : undefined}
-          >
-            <div>
-              <span className="sidebar-link__label">{item.label}</span>
-              <span className="sidebar-link__description">
-                {item.description}
-              </span>
-            </div>
-          </button>
-        ))}
+        {navigation.map((item) => {
+          const isActive = item.id === activeView;
+          return (
+            <button
+              key={item.id}
+              type="button"
+              className={`sidebar-link ${isActive ? "is-active" : ""}`}
+              aria-current={isActive ? "page" : undefined}
+              onClick={() => onNavigate(item.id)}
+            >
+              <div>
+                <span className="sidebar-link__label">{item.label}</span>
+                <span className="sidebar-link__description">{item.description}</span>
+              </div>
+            </button>
+          );
+        })}
       </nav>
 
       <div className="portal-sidebar__maintenance">
