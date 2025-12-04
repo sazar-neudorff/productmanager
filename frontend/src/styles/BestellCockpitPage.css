@@ -44,19 +44,93 @@
   margin: 0;
 }
 
-.cockpit-search-row,
+.cockpit-search,
 .cockpit-filter-row {
   display: flex;
+  flex-direction: column;
   gap: var(--space-sm);
-  flex-wrap: wrap;
-  align-items: flex-end;
 }
 
-.cockpit-search-row input,
+.cockpit-search__field {
+  position: relative;
+  display: flex;
+  align-items: center;
+}
+
+.cockpit-search__field input,
 .cockpit-filter-row input {
   flex: 1;
   min-width: 220px;
   padding: 0.5rem 0.8rem;
+.cockpit-search__clear {
+  position: absolute;
+  right: 0.5rem;
+  top: 50%;
+  transform: translateY(-50%);
+  border: none;
+  background: transparent;
+  font-size: 1.2rem;
+  padding: 0;
+  color: rgba(0, 0, 0, 0.4);
+  cursor: pointer;
+}
+
+.cockpit-search__combo {
+  position: relative;
+  display: grid;
+  gap: 0.35rem;
+}
+
+.cockpit-search__combo {
+  border: 1px solid rgba(0, 0, 0, 0.08);
+  border-radius: 14px;
+  background: #ffffff;
+  box-shadow: 0 12px 30px rgba(0, 0, 0, 0.1);
+  padding: var(--space-sm);
+  max-height: 240px;
+  overflow-y: auto;
+  margin-top: 0.35rem;
+}
+
+.cockpit-search__item {
+  display: flex;
+  align-items: center;
+  gap: var(--space-sm);
+  border-radius: 12px;
+  border: 1px solid rgba(0, 0, 0, 0.05);
+  padding: 0.5rem 0.75rem;
+  background: #fff;
+  cursor: pointer;
+  text-align: left;
+}
+
+.cockpit-search__item.is-selected {
+  border-color: rgba(49, 159, 73, 0.5);
+  box-shadow: 0 6px 16px rgba(49, 159, 73, 0.1);
+}
+
+.cockpit-search__item img {
+  width: 48px;
+  height: 48px;
+  border-radius: 12px;
+  object-fit: cover;
+  background: rgba(49, 159, 73, 0.1);
+}
+
+.cockpit-search__item-title {
+  margin: 0;
+  font-weight: 600;
+}
+
+.cockpit-search__item-meta {
+  margin: 0;
+  color: var(--clr-text-muted);
+  font-size: var(--font-size-sm);
+}
+
+.cockpit-search__combo strong {
+  margin-left: auto;
+}
   border-radius: 999px;
   border: 1px solid rgba(0, 0, 0, 0.15);
 }
