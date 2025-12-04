@@ -46,8 +46,7 @@
   font-weight: 600;
 }
 
-.portal-sidebar__nav,
-.portal-sidebar__section {
+.portal-sidebar__nav {
   display: flex;
   flex-direction: column;
   gap: var(--space-sm);
@@ -102,49 +101,6 @@
 .sidebar-link:hover:not(.is-active) {
   background: #e6fbe6;
   transform: translateX(2px);
-}
-
-.portal-sidebar__section-title {
-  margin: var(--space-sm) 0 var(--space-xs);
-  font-size: var(--font-size-sm);
-  text-transform: uppercase;
-  letter-spacing: 0.08em;
-  color: var(--sidebar-text-muted);
-}
-
-.portal-sidebar__note {
-  margin: 0;
-  color: var(--sidebar-text-muted);
-  line-height: 1.5;
-}
-
-.portal-sidebar__spotlight {
-  background: #fff;
-  border: 1px solid rgba(71, 64, 48, 0.12);
-  border-left: 4px solid #319f49;
-  border-radius: 16px;
-  padding: 1.25rem;
-  display: flex;
-  flex-direction: column;
-  gap: var(--space-sm);
-  box-shadow: 0 8px 16px rgba(0, 0, 0, 0.05);
-}
-
-.portal-sidebar__spotlight-value {
-  margin: 0;
-  font-size: 1.2rem;
-  font-weight: 700;
-  color: var(--clr-primary-2);
-}
-
-.portal-sidebar__spotlight-cta {
-  border: none;
-  border-radius: var(--radius-pill);
-  padding: 0.4rem 1rem;
-  background: var(--clr-primary-1);
-  color: var(--clr-text-inverse);
-  font-weight: 600;
-  cursor: pointer;
 }
 
 .portal-sidebar__maintenance {

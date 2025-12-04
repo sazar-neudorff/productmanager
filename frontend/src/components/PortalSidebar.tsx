@@ -44,19 +44,6 @@ export default function PortalSidebar() {
         ))}
       </nav>
 
-      <div className="portal-sidebar__section">
-        <p className="portal-sidebar__section-title">Heute im Fokus</p>
-        <div className="portal-sidebar__spotlight">
-          <p className="portal-sidebar__spotlight-value">Nützlingsbedarf 86%</p>
-          <p className="portal-sidebar__note">
-            Nachfrage aus Obi &amp; Baumarkt-Strecken im Auge behalten.
-          </p>
-          <button type="button" className="portal-sidebar__spotlight-cta">
-            Details ansehen
-          </button>
-        </div>
-      </div>
-
       <div className="portal-sidebar__maintenance">
         <div>
           <p className="portal-sidebar__maintenance-label">Wartungsmodus</p>
