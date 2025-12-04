@@ -13,11 +13,17 @@
   flex-direction: column;
   gap: 1.1rem;
   min-height: 200px;
+  cursor: pointer;
 }
 
 .module-card:hover {
   transform: translateY(-4px);
   box-shadow: 0 12px 26px rgba(0, 0, 0, 0.08);
+}
+
+.module-card--active {
+  border-color: rgba(49, 159, 73, 0.55);
+  box-shadow: 0 16px 32px rgba(49, 159, 73, 0.1);
 }
 
 .module-card h3 {
@@ -34,29 +40,13 @@
 
 .module-card__cta {
   margin-top: auto;
-  align-self: flex-start;
-  border: none;
-  background: transparent;
   color: #319f49;
   font-weight: 600;
-  padding: 0;
-  cursor: pointer;
   display: inline-flex;
   align-items: center;
-  gap: 0.3rem;
-  transition: color 0.2s ease, transform 0.2s ease;
+  gap: 0.35rem;
 }
 
 .module-card__cta::after {
   content: "→";
-  transition: transform 0.2s ease;
-}
-
-.module-card__cta:hover {
-  color: #267a38;
-  transform: translateX(2px);
-}
-
-.module-card__cta:hover::after {
-  transform: translateX(4px);
 }

@@ -1,5 +1,7 @@
 import { useMemo, useState } from "react";
+import type { ReactNode } from "react";
 import "../styles/ProductManager.css";
+import NeudorffTab from "./productManager/NeudorffTab";
 
 type SubTab = {
   id: string;
@@ -7,7 +9,8 @@ type SubTab = {
   eyebrow?: string;
   description: string;
   meta: string;
-  tasks: string[];
+  tasks?: string[];
+  component?: ReactNode;
 };
 
 type MainTab = {
@@ -30,7 +33,7 @@ const MAIN_TABS: MainTab[] = [
         description:
           "Zentrale Pflege der internen Daten. Codes, Sets und Exporte laufen hier zusammen.",
         meta: "Codes & Pflege",
-        tasks: ["Module laden", "Felder prüfen", "Exports vorbereiten"],
+        component: <NeudorffTab />,
       },
       {
         id: "shopify",
@@ -180,20 +183,28 @@ export default function ProductManagerLauncher() {
           ))}
         </div>
 
-        <div className="product-launcher__content">
-          {activeSubTab && (
+        <div
+          className={`product-launcher__content ${
+            activeSubTab?.component ? "product-launcher__content--embedded" : ""
+          }`.trim()}
+        >
+          {activeSubTab?.component ? (
+            activeSubTab.component
+          ) : (
             <>
-              {activeSubTab.eyebrow && (
+              {activeSubTab?.eyebrow && (
                 <p className="product-launcher__content-eyebrow">{activeSubTab.eyebrow}</p>
               )}
-              <h4>{activeSubTab.label}</h4>
-              <p className="product-launcher__content-description">{activeSubTab.description}</p>
+              <h4>{activeSubTab?.label}</h4>
+              <p className="product-launcher__content-description">{activeSubTab?.description}</p>
 
-              <ul className="product-launcher__task-list">
-                {activeSubTab.tasks.map((task) => (
-                  <li key={task}>{task}</li>
-                ))}
-              </ul>
+              {activeSubTab?.tasks && (
+                <ul className="product-launcher__task-list">
+                  {activeSubTab.tasks.map((task) => (
+                    <li key={task}>{task}</li>
+                  ))}
+                </ul>
+              )}
             </>
           )}
         </div>

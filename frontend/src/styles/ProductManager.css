@@ -147,6 +147,13 @@
   gap: var(--space-sm);
 }
 
+.product-launcher__content--embedded {
+  border: none;
+  padding: 0;
+  background: transparent;
+  min-height: 0;
+}
+
 .product-launcher__content-eyebrow {
   margin: 0;
   font-size: var(--font-size-xs);

@@ -1,15 +1,26 @@
+import { useMemo, useState } from "react";
 import type { ComponentProps } from "react";
 import ModuleCard from "../components/ModuleCard";
 import ProductManagerLauncher from "../components/ProductManagerLauncher";
 import "../styles/Home.css";
 
-const modules: ComponentProps<typeof ModuleCard>[] = [
-  { title: "Nützlingsportal Admin", caption: "Codes & Pflege" },
-  { title: "Produktmanagement", caption: "Daten & Assets" },
-  { title: "Bestell Cockpit", caption: "Aufträge & Routing" },
+type ModuleConfig = ComponentProps<typeof ModuleCard> & {
+  id: string;
+};
+
+const modules: ModuleConfig[] = [
+  { id: "nuetzlingsportal", title: "Nützlingsportal Admin", caption: "Codes & Pflege" },
+  { id: "product-management", title: "Produktmanagement", caption: "Daten & Assets" },
+  { id: "bestell-cockpit", title: "Bestell Cockpit", caption: "Aufträge & Routing" },
 ];
 
 export default function Home() {
+  const [activeModuleId, setActiveModuleId] = useState<string>(modules[0].id);
+  const activeModule = useMemo(
+    () => modules.find((module) => module.id === activeModuleId) ?? modules[0],
+    [activeModuleId]
+  );
+
   return (
     <div className="dashboard">
       <section className="dashboard-hero">
@@ -35,18 +46,25 @@ export default function Home() {
 
         <div className="module-grid">
           {modules.map((module) => (
-            <ModuleCard key={module.title} {...module} />
+            <ModuleCard
+              key={module.id}
+              {...module}
+              isActive={module.id === activeModuleId}
+              onSelect={() => setActiveModuleId(module.id)}
+            />
           ))}
         </div>
 
-        <div className="product-launcher-wrapper">
-          <div className="product-launcher__tab-label">
-            <span className="product-launcher__tab-label-kicker">Produkt Management</span>
-            <h3>Produktmanager (Launcher)</h3>
-            <p>Öffnet die internen Module für Neudorff, Shopify, OBI und Bauhaus.</p>
+        {activeModule.id === "product-management" && (
+          <div className="product-launcher-wrapper">
+            <div className="product-launcher__tab-label">
+              <span className="product-launcher__tab-label-kicker">Produkt Management</span>
+              <h3>Produktmanager (Launcher)</h3>
+              <p>Öffnet die internen Module für Neudorff, Shopify, OBI und Bauhaus.</p>
+            </div>
+            <ProductManagerLauncher />
           </div>
-          <ProductManagerLauncher />
-        </div>
+        )}
       </section>
     </div>
   );
