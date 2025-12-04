@@ -1,5 +1,6 @@
 import type { ComponentProps } from "react";
 import ModuleCard from "../components/ModuleCard";
+import ProductManagerLauncher from "../components/ProductManagerLauncher";
 import "../styles/Home.css";
 
 const modules: ComponentProps<typeof ModuleCard>[] = [
@@ -37,6 +38,10 @@ export default function Home() {
             <ModuleCard key={module.title} {...module} />
           ))}
         </div>
+      </section>
+
+      <section className="product-launcher-section">
+        <ProductManagerLauncher />
       </section>
     </div>
   );
