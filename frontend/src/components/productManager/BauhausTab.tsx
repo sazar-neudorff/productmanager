@@ -40,7 +40,7 @@ const MOCK_ROWS = [
 ];
 
 export default function BauhausTab() {
-  const [filter, setFilter] = useState("");
+  const [query, setQuery] = useState("");
   const [selectedColumns, setSelectedColumns] = useState<Record<string, boolean>>(() =>
     BAUHAUS_COLUMNS.reduce(
       (acc, column) => ({
@@ -135,17 +135,17 @@ export default function BauhausTab() {
       <div className="neudorff-panel">
         <div className="neudorff-panel__header">
           <div>
-            <p className="neudorff-panel__eyebrow">Suche</p>
-            <h5>Product Line oder Name</h5>
+            <p className="neudorff-panel__eyebrow">Filter</p>
+            <h5>EAN · SKU · Produktname</h5>
           </div>
         </div>
         <div className="neudorff-filter-row">
-          <label htmlFor="bauhaus-filter">Begriff</label>
+          <label htmlFor="bauhaus-filter">Suchfeld</label>
           <input
             id="bauhaus-filter"
-            placeholder="BioTrissol ..."
-            value={filter}
-            onChange={(event) => setFilter(event.target.value)}
+            placeholder="EAN, SKU oder Produktname ..."
+            value={query}
+            onChange={(event) => setQuery(event.target.value)}
           />
           <button type="button">Filtern</button>
           <button type="button" className="secondary">

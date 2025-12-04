@@ -39,8 +39,7 @@ const MOCK_ROWS = [
 
 export default function ShopifyTab() {
   const [country, setCountry] = useState("DE");
-  const [search, setSearch] = useState("");
-  const [eanFilter, setEanFilter] = useState("");
+  const [query, setQuery] = useState("");
   const [selectedColumns, setSelectedColumns] = useState<Record<string, boolean>>(() =>
     SHOPIFY_COLUMNS.reduce(
       (acc, column) => ({
@@ -147,23 +146,16 @@ export default function ShopifyTab() {
         <div className="neudorff-panel__header">
           <div>
             <p className="neudorff-panel__eyebrow">Filter</p>
-            <h5>Handles & Varianten</h5>
+            <h5>EAN · SKU · Produktname</h5>
           </div>
         </div>
         <div className="neudorff-filter-row">
-          <label htmlFor="shopify-ean">EAN / ArtNr</label>
+          <label htmlFor="shopify-filter">Suchfeld</label>
           <input
-            id="shopify-ean"
-            placeholder="400524..."
-            value={eanFilter}
-            onChange={(event) => setEanFilter(event.target.value)}
-          />
-          <label htmlFor="shopify-search">Handle</label>
-          <input
-            id="shopify-search"
-            placeholder="mulch-master ..."
-            value={search}
-            onChange={(event) => setSearch(event.target.value)}
+            id="shopify-filter"
+            placeholder="EAN, SKU oder Produktname eingeben ..."
+            value={query}
+            onChange={(event) => setQuery(event.target.value)}
           />
           <button type="button">Filtern</button>
           <button type="button" className="secondary">

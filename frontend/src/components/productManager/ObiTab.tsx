@@ -33,7 +33,7 @@ const MOCK_ROWS = [
 ];
 
 export default function ObiTab() {
-  const [eanFilter, setEanFilter] = useState("");
+  const [query, setQuery] = useState("");
   const [selectedColumns, setSelectedColumns] = useState<Record<string, boolean>>(() =>
     OBI_COLUMNS.reduce(
       (acc, column) => ({
@@ -129,16 +129,16 @@ export default function ObiTab() {
         <div className="neudorff-panel__header">
           <div>
             <p className="neudorff-panel__eyebrow">Filter</p>
-            <h5>EAN oder Lief.-Art.-Nr</h5>
+            <h5>EAN · SKU · Produktname</h5>
           </div>
         </div>
         <div className="neudorff-filter-row">
-          <label htmlFor="obi-filter">Werte eingeben</label>
+          <label htmlFor="obi-filter">Suchfeld</label>
           <input
             id="obi-filter"
-            placeholder="400524..."
-            value={eanFilter}
-            onChange={(event) => setEanFilter(event.target.value)}
+            placeholder="EAN, Lieferartikel oder Produktname ..."
+            value={query}
+            onChange={(event) => setQuery(event.target.value)}
           />
           <button type="button">Filtern</button>
           <button type="button" className="secondary">
