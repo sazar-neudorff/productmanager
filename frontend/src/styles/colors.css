@@ -1,43 +1,46 @@
 :root {
-  --clr-primary-1: #0f9d58;
-  --clr-primary-2: #0b7c44;
-  --clr-primary-3: #064c27;
+  --clr-primary-1: #319f49;
+  --clr-primary-2: #2a7d3d;
+  --clr-primary-3: #1f5c2d;
 
-  --clr-accent-yellow-1: #fff8db;
-  --clr-accent-yellow-2: #ffe9a3;
-  --clr-accent-yellow-3: #ffd33d;
+  --clr-accent-yellow-1: #fffdf3;
+  --clr-accent-yellow-2: #ffeea8;
+  --clr-accent-yellow-3: #ffd95b;
+  --clr-accent-yellow-4: #f5c33b;
 
-  --clr-accent-blue-1: #e0f2ff;
-  --clr-accent-blue-2: #b3e0ff;
-  --clr-accent-blue-3: #0c6efd;
+  --clr-accent-blue-1: #e6f4ea;
+  --clr-accent-blue-2: #c8ead3;
+  --clr-accent-blue-3: #2c8e2a;
 
+  --clr-earth-brown: #474030;
   --clr-badge-pink: #ffe3f1;
   --clr-badge-pink-text: #b83280;
 
-  --clr-gray-0: #f8fafc;
-  --clr-gray-1: #eef2f7;
-  --clr-gray-2: #d8dee7;
-  --clr-gray-3: #b5c0ce;
-  --clr-gray-4: #8290a3;
-  --clr-gray-5: #536076;
+  --clr-gray-0: #fffef8;
+  --clr-gray-1: #f7f3e8;
+  --clr-gray-2: #e7dfcf;
+  --clr-gray-3: #cbbd9f;
+  --clr-gray-4: #9d9274;
+  --clr-gray-5: #5e5642;
 
-  --clr-surface: #f4f6fb;
+  --clr-surface: #fffef3;
   --clr-surface-strong: #ffffff;
-  --clr-surface-muted: #f0f3f9;
-  --clr-surface-accent: linear-gradient(180deg, #0f172a, #101828);
+  --clr-surface-muted: #fff8e6;
+  --clr-surface-accent: linear-gradient(140deg, #ffee50 0%, #ffe08a 45%, #fffaf1 100%);
 
-  --clr-border: rgba(15, 23, 42, 0.08);
-  --clr-border-strong: rgba(15, 23, 42, 0.16);
+  --clr-border: rgba(71, 64, 48, 0.15);
+  --clr-border-strong: rgba(71, 64, 48, 0.3);
 
-  --clr-text-main: #111827;
-  --clr-text-muted: #5e6b80;
-  --clr-text-subtle: #7c879a;
+  --clr-text-main: #23333a;
+  --clr-text-muted: #5c6152;
+  --clr-text-subtle: #7a7159;
   --clr-text-inverse: #ffffff;
+  --clr-heading: #23333a;
 
-  --clr-success: #1b9c64;
-  --clr-success-muted: #d6f5e8;
-  --clr-warning: #c36900;
-  --clr-warning-muted: #fff0d4;
+  --clr-success: #319f49;
+  --clr-success-muted: #e6f4ea;
+  --clr-warning: #d28400;
+  --clr-warning-muted: #fff4d6;
   --clr-danger: #c62828;
   --clr-danger-muted: #fde1df;
 }

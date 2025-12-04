@@ -4,6 +4,16 @@ import "../styles/Home.css";
 
 const modules: ComponentProps<typeof ModuleCard>[] = [
   {
+    title: "Nützlingsportal Admin",
+    description:
+      "Codes generieren, Sets prüfen und alle Admin-Flows freigeben.",
+    owner: "Team Gartenbau",
+    updatedAt: "Letztes Update · 09:42",
+    kpi: { label: "Aktive Codes", value: "128" },
+    tags: ["Nützlinge", "Admin"],
+    status: "stable",
+  },
+  {
     title: "Produktmanagement",
     description: "Exports & Vorlagen für Obi, Otto, Shopify oder interne Kanäle.",
     owner: "Team Produkt",
@@ -32,13 +42,19 @@ export default function Home() {
           <h2>Neudorff Plattform</h2>
           <p className="hero-description">
             Allgemeiner Zugang zur internen Plattform. Starte in einem Modul, um
-            Exporte zu steuern oder Bestellungen für die Teams einzureichen.
+            Codes zu verwalten, Exporte zu steuern oder Bestellungen für die Teams
+            einzureichen.
           </p>
+          <p className="hero-handwriting">Alles für das Nützlingsportal an einem Ort.</p>
 
           <ul className="hero-summary">
             <li>
+              <strong>Nützlingsportal Admin:</strong> Codes freigeben und den
+              Wartungsmodus steuern.
+            </li>
+            <li>
               <strong>Produktmanagement:</strong> Produktlisten und Templates
-              für Obi, Otto, Shopify & Co.
+              für Obi, Otto, Shopify &amp; Co.
             </li>
             <li>
               <strong>Bestell Cockpit:</strong> Bestellungen an interne Systeme

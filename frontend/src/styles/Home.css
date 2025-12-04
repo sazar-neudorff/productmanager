@@ -6,27 +6,50 @@
   display: flex;
   flex-direction: column;
   gap: var(--space-xl);
+  position: relative;
 }
 
 .dashboard-hero {
-  border: 1px solid var(--clr-border);
-  border-radius: var(--radius-lg);
-  padding: var(--space-xl);
-  background: var(--clr-surface-strong);
-  box-shadow: var(--shadow-sm);
+  border-radius: 32px;
+  padding: clamp(1.5rem, 3vw, 3rem);
+  background: linear-gradient(145deg, #fff8d6 0%, #fffdf5 60%, #ffffff 100%);
+  border: 1px solid rgba(71, 64, 48, 0.12);
+  box-shadow: 0 16px 40px rgba(71, 64, 48, 0.12);
+  overflow: hidden;
+  position: relative;
+}
+
+.dashboard-hero::after {
+  content: "";
+  position: absolute;
+  inset: -40% auto auto -10%;
+  width: 340px;
+  height: 340px;
+  background: radial-gradient(circle, rgba(49, 159, 73, 0.15), transparent 70%);
+  pointer-events: none;
 }
 
 .hero-main {
   display: flex;
   flex-direction: column;
-  gap: var(--space-lg);
+  gap: var(--space-md);
   max-width: 720px;
+  position: relative;
+  z-index: 1;
 }
 
 .hero-description {
   margin: 0;
   color: var(--clr-text-muted);
   line-height: 1.6;
+  font-size: 1.05rem;
+}
+
+.hero-handwriting {
+  margin: 0;
+  font-family: var(--font-accent);
+  font-size: clamp(1.3rem, 2vw, 1.7rem);
+  color: var(--clr-primary-2);
 }
 
 .hero-summary {
@@ -40,18 +63,19 @@
 
 .hero-summary li {
   margin: 0;
-  padding: var(--space-md);
-  border-radius: var(--radius-md);
-  border: 1px solid var(--clr-border);
-  background: var(--clr-gray-0);
+  padding: var(--space-md) var(--space-lg);
+  border-radius: var(--radius-lg);
+  border: 1px solid rgba(71, 64, 48, 0.08);
+  background: #ffffff;
+  box-shadow: 0 10px 24px rgba(71, 64, 48, 0.08);
 }
 
 .dashboard-section {
-  background: var(--clr-surface-strong);
-  border-radius: var(--radius-lg);
-  border: 1px solid var(--clr-border);
-  padding: var(--space-xl);
-  box-shadow: var(--shadow-sm);
+  background: #ffffff;
+  border-radius: 28px;
+  border: 1px solid rgba(71, 64, 48, 0.08);
+  padding: clamp(1.25rem, 3vw, 2.5rem);
+  box-shadow: 0 16px 40px rgba(71, 64, 48, 0.08);
 }
 
 .section-heading {
