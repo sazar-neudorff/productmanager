@@ -13,7 +13,7 @@ const modules: ComponentProps<typeof ModuleCard>[] = [
     status: "stable",
   },
   {
-    title: "Fachberatung",
+    title: "Bestell Cockpit",
     description: "Bestellungen erfassen und sicher in die Backend-Systeme schicken.",
     owner: "Team Beratung",
     updatedAt: "Aufbau läuft",
@@ -29,7 +29,7 @@ export default function Home() {
       <section className="dashboard-hero">
         <div className="hero-main">
           <p className="section-heading__eyebrow">Startbereich</p>
-          <h2>Operations Plattform</h2>
+          <h2>Neudorff Plattform</h2>
           <p className="hero-description">
             Allgemeiner Zugang zur internen Plattform. Starte in einem Modul, um
             Exporte zu steuern oder Bestellungen für die Teams einzureichen.
@@ -41,7 +41,7 @@ export default function Home() {
               für Obi, Otto, Shopify & Co.
             </li>
             <li>
-              <strong>Fachberatung:</strong> Bestellungen an interne Systeme
+              <strong>Bestell Cockpit:</strong> Bestellungen an interne Systeme
               übergeben.
             </li>
           </ul>
