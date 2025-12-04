@@ -2,14 +2,27 @@ import "../styles/Sidebar.css";
 
 const navigation = [
   {
-    label: "Module",
-    description: "Übersicht & Zugriff",
+    label: "Nützlingsportal Admin",
+    description: "Codes & Pflege",
     isActive: true,
   },
   {
-    label: "Rollen & Rechte",
-    description: "Teamverwaltung",
+    label: "Bestell Cockpit",
+    description: "Kanäle & Händler",
   },
+  {
+    label: "Produktmanagement",
+    description: "Exporte & Sets",
+  },
+  {
+    label: "Berichte",
+    description: "Performance",
+  },
+];
+
+const stats = [
+  { label: "Aktive Codes", value: "128" },
+  { label: "Wartung", value: "Aus" },
 ];
 
 export default function PortalSidebar() {
@@ -17,8 +30,9 @@ export default function PortalSidebar() {
     <aside className="portal-sidebar" aria-label="Seitennavigation">
       <div className="portal-sidebar__brand">
         <div className="portal-sidebar__badge">Neudorff</div>
-        <h2>Dashboard</h2>
-        <p>Interne Module</p>
+        <p className="portal-sidebar__tagline">Interne Plattform</p>
+        <h2>Nützlingsportal Admin</h2>
+        <p>Pflege der Nützlings-Bestände</p>
       </div>
 
       <nav className="portal-sidebar__nav" aria-label="Hauptnavigation">
@@ -40,11 +54,30 @@ export default function PortalSidebar() {
       </nav>
 
       <div className="portal-sidebar__section">
-        <p className="portal-sidebar__section-title">Info</p>
-        <p className="portal-sidebar__note">
-          Weitere Bereiche folgen, sobald Module und Rollen vergeben sind.
-        </p>
+        <p className="portal-sidebar__section-title">Heute im Fokus</p>
+        <div className="portal-sidebar__spotlight">
+          <p className="portal-sidebar__spotlight-value">Nützlingsbedarf 86%</p>
+          <p className="portal-sidebar__note">
+            Nachfrage aus Obi &amp; Baumarkt-Strecken im Auge behalten.
+          </p>
+          <button type="button" className="portal-sidebar__spotlight-cta">
+            Details ansehen
+          </button>
+        </div>
       </div>
+
+      <div className="portal-sidebar__stats">
+        {stats.map((stat) => (
+          <div key={stat.label} className="sidebar-stat">
+            <span className="sidebar-stat__value">{stat.value}</span>
+            <span className="sidebar-stat__label">{stat.label}</span>
+          </div>
+        ))}
+      </div>
+
+      <button type="button" className="portal-sidebar__logout">
+        Abmelden
+      </button>
     </aside>
   );
 }

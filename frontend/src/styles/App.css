@@ -8,6 +8,29 @@
   background: var(--clr-surface);
   color: var(--clr-text-main);
   font-family: var(--font-main);
+  position: relative;
+  overflow: hidden;
+}
+
+.app-shell::before,
+.app-shell::after {
+  content: "";
+  position: fixed;
+  width: 420px;
+  height: 420px;
+  background: radial-gradient(circle, rgba(255, 232, 120, 0.25), transparent 70%);
+  z-index: 0;
+  pointer-events: none;
+}
+
+.app-shell::before {
+  top: -140px;
+  right: -80px;
+}
+
+.app-shell::after {
+  bottom: -120px;
+  left: -80px;
 }
 
 .app-main {
@@ -15,7 +38,9 @@
   min-height: 100vh;
   display: flex;
   flex-direction: column;
-  background: var(--clr-surface);
+  background: transparent;
+  position: relative;
+  z-index: 1;
 }
 
 .app-content {
@@ -23,7 +48,7 @@
   width: 100%;
   max-width: var(--layout-content-width);
   margin: 0 auto;
-  padding: var(--space-xl) var(--space-2xl);
+  padding: var(--space-2xl);
 }
 
 @media (max-width: 1200px) {
