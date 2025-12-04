@@ -6,7 +6,6 @@ const modules: ComponentProps<typeof ModuleCard>[] = [
   { title: "Nützlingsportal Admin", caption: "Codes & Pflege", accent: "green" },
   { title: "Produktmanagement", caption: "Daten & Assets", accent: "yellow" },
   { title: "Bestell Cockpit", caption: "Aufträge & Routing", accent: "brown" },
-  { title: "Kanäle & Händler", caption: "Exporte koordinieren", accent: "green" },
 ];
 
 export default function Home() {
