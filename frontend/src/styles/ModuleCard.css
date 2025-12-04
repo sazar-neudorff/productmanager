@@ -4,21 +4,20 @@
 
 .module-card {
   background: #ffffff;
-  padding: 1.75rem;
-  border-radius: 22px;
-  border: 2px solid rgba(49, 159, 73, 0.3);
-  box-shadow: 0 12px 28px rgba(0, 0, 0, 0.06);
-  transition: transform var(--transition-medium), box-shadow var(--transition-medium), border-color var(--transition-medium);
+  padding: 1.5rem;
+  border-radius: 20px;
+  border: 1px solid rgba(0, 0, 0, 0.06);
+  box-shadow: 0 6px 16px rgba(0, 0, 0, 0.04);
+  transition: transform var(--transition-medium), box-shadow var(--transition-medium);
   display: flex;
   flex-direction: column;
-  gap: 1.25rem;
-  min-height: 220px;
+  gap: 1.1rem;
+  min-height: 200px;
 }
 
 .module-card:hover {
-  transform: translateY(-8px);
-  box-shadow: 0 24px 50px rgba(0, 0, 0, 0.12);
-  border-color: rgba(49, 159, 73, 0.6);
+  transform: translateY(-4px);
+  box-shadow: 0 12px 26px rgba(0, 0, 0, 0.08);
 }
 
 .module-card h3 {

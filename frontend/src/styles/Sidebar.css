@@ -12,7 +12,7 @@
   flex-direction: column;
   gap: var(--space-lg);
   border-right: 1px solid #ddd;
-  box-shadow: 0 0 20px rgba(0, 0, 0, 0.05);
+  box-shadow: none;
   box-sizing: border-box;
 }
 
