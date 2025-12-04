@@ -36,19 +36,28 @@
 .module-card__cta {
   margin-top: auto;
   align-self: flex-start;
-  border: 1px solid #319f49;
+  border: none;
   background: transparent;
   color: #319f49;
   font-weight: 600;
-  border-radius: 999px;
-  padding: 0.55rem 1.4rem;
+  padding: 0;
   cursor: pointer;
-  transition: transform 0.2s ease, box-shadow 0.2s ease;
+  display: inline-flex;
+  align-items: center;
+  gap: 0.3rem;
+  transition: color 0.2s ease, transform 0.2s ease;
+}
+
+.module-card__cta::after {
+  content: "→";
+  transition: transform 0.2s ease;
 }
 
 .module-card__cta:hover {
-  transform: translateY(-2px);
-  box-shadow: 0 10px 20px rgba(49, 159, 73, 0.25);
-  background: #319f49;
-  color: #fff;
+  color: #267a38;
+  transform: translateX(2px);
+}
+
+.module-card__cta:hover::after {
+  transform: translateX(4px);
 }

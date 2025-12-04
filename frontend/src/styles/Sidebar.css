@@ -5,14 +5,14 @@
 .portal-sidebar {
   width: 320px;
   min-height: 100%;
-  background: linear-gradient(180deg, #f5ffe6 0%, #ffffff 70%);
+  background: #f9f9f9;
   color: var(--clr-text-main);
   padding: 2rem 1.5rem;
   display: flex;
   flex-direction: column;
   gap: var(--space-lg);
-  border-right: 1px solid rgba(49, 159, 73, 0.2);
-  box-shadow: 0 0 25px rgba(0, 0, 0, 0.06);
+  border-right: 1px solid #ddd;
+  box-shadow: 0 0 20px rgba(0, 0, 0, 0.05);
   box-sizing: border-box;
 }
 
@@ -53,26 +53,26 @@
 }
 
 .portal-sidebar__nav {
-  padding: 1.5rem 1rem;
-  border-radius: 16px;
-  background: #ffffff;
-  box-shadow: inset 0 0 0 1px rgba(71, 64, 48, 0.05);
+  padding: 0;
+  border-radius: 0;
+  background: transparent;
+  box-shadow: none;
 }
 
 .sidebar-link {
   width: 100%;
   text-align: left;
   background: transparent;
-  border: 1px solid transparent;
-  border-radius: var(--radius-lg);
-  color: inherit;
-  padding: var(--space-sm) var(--space-md);
+  border: none;
+  border-radius: 6px;
+  color: #319f49;
+  padding: 0.6rem 0.8rem;
   display: flex;
   gap: var(--space-sm);
   justify-content: space-between;
   align-items: center;
   cursor: pointer;
-  transition: background var(--transition-medium), border var(--transition-medium), transform var(--transition-medium), box-shadow var(--transition-medium);
+  transition: background 0.2s ease, transform 0.2s ease, font-weight 0.2s ease;
 }
 
 .sidebar-link div {
@@ -92,8 +92,7 @@
 
 .sidebar-link.is-active {
   background: #d9f7dc;
-  border-color: #319f49;
-  box-shadow: 0 8px 18px rgba(49, 159, 73, 0.2);
+  border-left: 4px solid #319f49;
   transform: translateX(4px);
   font-weight: 600;
 }
@@ -101,6 +100,7 @@
 .sidebar-link:hover:not(.is-active) {
   background: #e6fbe6;
   transform: translateX(2px);
+  font-weight: 600;
 }
 
 .portal-sidebar__maintenance {
