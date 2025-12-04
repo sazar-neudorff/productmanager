@@ -90,8 +90,32 @@
   gap: var(--space-lg);
 }
 
-.product-launcher-section {
+.product-launcher-wrapper {
   margin-top: var(--space-xl);
+}
+
+.product-launcher__tab-label {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-xs);
+  margin-bottom: var(--space-md);
+}
+
+.product-launcher__tab-label h3 {
+  margin: 0;
+  color: var(--clr-text-main);
+}
+
+.product-launcher__tab-label p {
+  margin: 0;
+  color: var(--clr-text-muted);
+}
+
+.product-launcher__tab-label-kicker {
+  font-size: var(--font-size-xs);
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: var(--clr-text-muted);
 }
 
 @media (max-width: 768px) {

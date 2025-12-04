@@ -38,10 +38,15 @@ export default function Home() {
             <ModuleCard key={module.title} {...module} />
           ))}
         </div>
-      </section>
 
-      <section className="product-launcher-section">
-        <ProductManagerLauncher />
+        <div className="product-launcher-wrapper">
+          <div className="product-launcher__tab-label">
+            <span className="product-launcher__tab-label-kicker">Produkt Management</span>
+            <h3>Produktmanager (Launcher)</h3>
+            <p>Öffnet die internen Module für Neudorff, Shopify, OBI und Bauhaus.</p>
+          </div>
+          <ProductManagerLauncher />
+        </div>
       </section>
     </div>
   );
