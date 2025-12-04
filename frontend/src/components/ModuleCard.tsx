@@ -4,7 +4,7 @@ type ModuleStatus = "stable" | "attention" | "warning";
 
 interface ModuleCardProps {
   title: string;
-  description: string;
+  description?: string;
   owner: string;
   updatedAt: string;
   kpi?: {
@@ -40,7 +40,7 @@ export default function ModuleCard({
       </div>
 
       <h3>{title}</h3>
-      <p className="module-card__description">{description}</p>
+      {description && <p className="module-card__description">{description}</p>}
 
       {kpi && (
         <div className="module-card__kpi">

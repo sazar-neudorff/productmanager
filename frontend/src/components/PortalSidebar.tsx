@@ -14,15 +14,6 @@ const navigation = [
     label: "Produktmanagement",
     description: "Exporte & Sets",
   },
-  {
-    label: "Berichte",
-    description: "Performance",
-  },
-];
-
-const stats = [
-  { label: "Aktive Codes", value: "128" },
-  { label: "Wartung", value: "Aus" },
 ];
 
 export default function PortalSidebar() {
@@ -66,13 +57,15 @@ export default function PortalSidebar() {
         </div>
       </div>
 
-      <div className="portal-sidebar__stats">
-        {stats.map((stat) => (
-          <div key={stat.label} className="sidebar-stat">
-            <span className="sidebar-stat__value">{stat.value}</span>
-            <span className="sidebar-stat__label">{stat.label}</span>
-          </div>
-        ))}
+      <div className="portal-sidebar__maintenance">
+        <div>
+          <p className="portal-sidebar__maintenance-label">Wartungsmodus</p>
+          <span className="portal-sidebar__maintenance-status">Live</span>
+        </div>
+        <label className="sidebar-switch" aria-label="Wartungsmodus">
+          <input type="checkbox" checked={false} readOnly />
+          <span className="sidebar-slider" />
+        </label>
       </div>
 
       <button type="button" className="portal-sidebar__logout">
