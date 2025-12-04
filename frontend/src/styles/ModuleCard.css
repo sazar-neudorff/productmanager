@@ -13,17 +13,15 @@
   flex-direction: column;
   gap: 1.1rem;
   min-height: 200px;
+}
+
+.module-card--interactive {
   cursor: pointer;
 }
 
-.module-card:hover {
+.module-card--interactive:hover {
   transform: translateY(-4px);
   box-shadow: 0 12px 26px rgba(0, 0, 0, 0.08);
-}
-
-.module-card--active {
-  border-color: rgba(49, 159, 73, 0.55);
-  box-shadow: 0 16px 32px rgba(49, 159, 73, 0.1);
 }
 
 .module-card h3 {

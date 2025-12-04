@@ -1,0 +1,77 @@
+@import "./colors.css";
+@import "./tokens.css";
+@import "./typography.css";
+
+.product-management-page {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-xl);
+  padding: clamp(1.5rem, 3vw, 2.5rem);
+}
+
+.product-management-hero {
+  background: linear-gradient(180deg, #fffcef 0%, #ffffff 80%);
+  border-radius: 28px;
+  padding: clamp(1.5rem, 3vw, 3rem);
+  border: 1px solid rgba(0, 0, 0, 0.05);
+  box-shadow: 0 18px 32px rgba(0, 0, 0, 0.06);
+  display: flex;
+  justify-content: space-between;
+  gap: var(--space-lg);
+  flex-wrap: wrap;
+}
+
+.product-management-hero__eyebrow {
+  margin: 0;
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+  font-size: var(--font-size-xs);
+  color: var(--clr-text-muted);
+}
+.product-management-hero h2 {
+  margin: 0.2rem 0 0.5rem;
+  font-size: clamp(1.8rem, 3vw, 2.4rem);
+}
+
+.product-management-hero p {
+  margin: 0;
+  color: var(--clr-text-muted);
+  max-width: 620px;
+}
+
+.product-management-hero__actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--space-sm);
+  align-items: flex-start;
+}
+
+.product-management-hero__actions button {
+  border-radius: 999px;
+  border: none;
+  padding: 0.6rem 1.4rem;
+  cursor: pointer;
+  background: #319f49;
+  color: #fff;
+  font-weight: 600;
+}
+
+.product-management-hero__actions button.secondary {
+  background: #ffffff;
+  color: #319f49;
+  border: 1px solid rgba(49, 159, 73, 0.3);
+}
+
+@media (max-width: 768px) {
+  .product-management-page {
+    padding: var(--space-lg);
+  }
+
+  .product-management-hero {
+    flex-direction: column;
+  }
+
+  .product-management-hero__actions {
+    width: 100%;
+  }
+}
