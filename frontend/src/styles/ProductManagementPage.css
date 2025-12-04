@@ -5,19 +5,19 @@
 .product-management-page {
   display: flex;
   flex-direction: column;
-  gap: var(--space-xl);
-  padding: clamp(1.5rem, 3vw, 2.5rem);
+  gap: var(--space-lg);
+  padding: clamp(1rem, 2vw, 1.8rem);
 }
 
 .product-management-hero {
   background: linear-gradient(180deg, #fffcef 0%, #ffffff 80%);
-  border-radius: 28px;
-  padding: clamp(1.5rem, 3vw, 3rem);
-  border: 1px solid rgba(0, 0, 0, 0.05);
-  box-shadow: 0 18px 32px rgba(0, 0, 0, 0.06);
+  border-radius: 22px;
+  padding: clamp(1.1rem, 2vw, 2.2rem);
+  border: 1px solid rgba(0, 0, 0, 0.03);
+  box-shadow: 0 12px 24px rgba(0, 0, 0, 0.05);
   display: flex;
   justify-content: space-between;
-  gap: var(--space-lg);
+  gap: var(--space-md);
   flex-wrap: wrap;
 }
 
