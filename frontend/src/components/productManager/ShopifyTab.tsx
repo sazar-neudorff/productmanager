@@ -1,6 +1,37 @@
-import { useState } from "react";
+import { useMemo, useState } from "react";
 
 const COUNTRY_OPTIONS = ["DE", "AT", "CH"];
+const SHOPIFY_COLUMNS = [
+  "Handle",
+  "Title",
+  "Body (HTML)",
+  "Vendor",
+  "Type",
+  "Tags",
+  "Published",
+  "Variant SKU",
+  "Variant Barcode",
+  "Variant Price",
+  "Option1 Name",
+  "Option1 Value",
+  "Meta Description",
+  "product.metafields.custom.headline",
+  "product.metafields.custom.anwendungstipp",
+  "product.metafields.custom.beschreibung_lang",
+  "product.metafields.custom.hinweise_zur_anwendung",
+  "product.metafields.custom.packungsgr_en_wirkstoff",
+  "product.metafields.custom.lieferzeit",
+  "product.metafields.custom.downloads",
+  "product.metafields.custom.downloads_gebrauchsanweisungen",
+  "product.metafields.custom.downloads_broschueren",
+  "Variant Fulfillment Service",
+  "Variant Inventory Tracker",
+  "Image Src",
+  "Image Position",
+  "Variant Image",
+];
+const SHOPIFY_IMAGE_COLUMNS = ["Image Src", "Image Position", "Variant Image"];
+
 const MOCK_ROWS = [
   { handle: "mulch-master", sku: "ND-2010", ean: "400524000120", status: "Bereit" },
   { handle: "spruzit-pro", sku: "ND-2011", ean: "400524000121", status: "Review" },
@@ -10,6 +41,52 @@ export default function ShopifyTab() {
   const [country, setCountry] = useState("DE");
   const [search, setSearch] = useState("");
   const [eanFilter, setEanFilter] = useState("");
+  const [selectedColumns, setSelectedColumns] = useState<Record<string, boolean>>(() =>
+    SHOPIFY_COLUMNS.reduce(
+      (acc, column) => ({
+        ...acc,
+        [column]: true,
+      }),
+      {} as Record<string, boolean>
+    )
+  );
+
+  const columnCount = useMemo(
+    () => Object.values(selectedColumns).filter(Boolean).length,
+    [selectedColumns]
+  );
+
+  const toggleColumn = (column: string) => {
+    setSelectedColumns((prev) => ({
+      ...prev,
+      [column]: !prev[column],
+    }));
+  };
+
+  const selectOnlyImages = () => {
+    setSelectedColumns(
+      SHOPIFY_COLUMNS.reduce(
+        (acc, column) => ({
+          ...acc,
+          [column]: SHOPIFY_IMAGE_COLUMNS.includes(column),
+        }),
+        {} as Record<string, boolean>
+      )
+    );
+  };
+
+  const toggleAllColumns = () => {
+    const allChecked = SHOPIFY_COLUMNS.every((column) => selectedColumns[column]);
+    setSelectedColumns(
+      SHOPIFY_COLUMNS.reduce(
+        (acc, column) => ({
+          ...acc,
+          [column]: !allChecked,
+        }),
+        {} as Record<string, boolean>
+      )
+    );
+  };
 
   return (
     <div className="neudorff-tab">
@@ -33,9 +110,37 @@ export default function ShopifyTab() {
             <button type="button">Neu laden</button>
           </div>
         </div>
-        <p className="neudorff-note">
-          Zuletzt aktualisiert · 09:40 · Exportdatei für {country}
-        </p>
+        <p className="neudorff-note">Zuletzt aktualisiert · 09:40 · Exportdatei für {country}</p>
+      </div>
+
+      <div className="neudorff-panel neudorff-panel--columns">
+        <div className="neudorff-panel__header">
+          <div>
+            <p className="neudorff-panel__eyebrow">Spaltenauswahl</p>
+            <h5>Shopify CSV Felder</h5>
+          </div>
+          <span className="neudorff-pill">{columnCount} aktiv</span>
+        </div>
+        <div className="neudorff-columns">
+          {SHOPIFY_COLUMNS.map((column) => (
+            <label key={column} className="neudorff-checkbox">
+              <input
+                type="checkbox"
+                checked={!!selectedColumns[column]}
+                onChange={() => toggleColumn(column)}
+              />
+              <span>{column}</span>
+            </label>
+          ))}
+        </div>
+        <div className="neudorff-panel__actions">
+          <button type="button" onClick={selectOnlyImages}>
+            Nur Bilder auswählen
+          </button>
+          <button type="button" onClick={toggleAllColumns}>
+            Alle umschalten
+          </button>
+        </div>
       </div>
 
       <div className="neudorff-panel">
