@@ -120,7 +120,7 @@ export default function ShopifyTab() {
           </div>
           <span className="neudorff-pill">{columnCount} aktiv</span>
         </div>
-        <div className="neudorff-columns">
+        <div className="neudorff-columns neudorff-columns--two">
           {SHOPIFY_COLUMNS.map((column) => (
             <label key={column} className="neudorff-checkbox">
               <input
