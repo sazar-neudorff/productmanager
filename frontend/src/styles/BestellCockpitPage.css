@@ -44,98 +44,81 @@
   margin: 0;
 }
 
-.cockpit-search,
+.cockpit-select,
 .cockpit-filter-row {
   display: flex;
   flex-direction: column;
   gap: var(--space-sm);
 }
 
-.cockpit-search__field {
-  position: relative;
-  display: flex;
-  align-items: center;
-}
-
-.cockpit-search__field input,
 .cockpit-filter-row input {
   flex: 1;
   min-width: 220px;
   padding: 0.5rem 0.8rem;
-.cockpit-search__clear {
-  position: absolute;
-  right: 0.5rem;
-  top: 50%;
-  transform: translateY(-50%);
-  border: none;
-  background: transparent;
-  font-size: 1.2rem;
-  padding: 0;
-  color: rgba(0, 0, 0, 0.4);
-  cursor: pointer;
+  border-radius: 12px;
+  border: 1px solid rgba(0, 0, 0, 0.12);
 }
 
-.cockpit-search__combo {
-  position: relative;
-  display: grid;
-  gap: 0.35rem;
-}
-
-.cockpit-search__combo {
-  border: 1px solid rgba(0, 0, 0, 0.08);
+.rs__control {
   border-radius: 14px;
-  background: #ffffff;
-  box-shadow: 0 12px 30px rgba(0, 0, 0, 0.1);
-  padding: var(--space-sm);
-  max-height: 240px;
-  overflow-y: auto;
-  margin-top: 0.35rem;
+  border: 1px solid rgba(0, 0, 0, 0.2);
+  min-height: 52px;
+  box-shadow: none;
+  padding: 0.1rem 0.35rem;
 }
 
-.cockpit-search__item {
+.rs__control--is-focused {
+  border-color: rgba(49, 159, 73, 0.6);
+  box-shadow: 0 0 0 3px rgba(49, 159, 73, 0.15);
+}
+
+.rs__value-container {
+  padding: 0 0.25rem;
+}
+
+.rs__menu {
+  border-radius: 18px;
+  padding: var(--space-sm);
+  box-shadow: 0 20px 35px rgba(0, 0, 0, 0.12);
+}
+
+.cockpit-select-option {
   display: flex;
   align-items: center;
-  gap: var(--space-sm);
-  border-radius: 12px;
-  border: 1px solid rgba(0, 0, 0, 0.05);
-  padding: 0.5rem 0.75rem;
-  background: #fff;
-  cursor: pointer;
-  text-align: left;
+  gap: var(--space-md);
+  padding: 0.4rem 0.2rem;
 }
 
-.cockpit-search__item.is-selected {
-  border-color: rgba(49, 159, 73, 0.5);
-  box-shadow: 0 6px 16px rgba(49, 159, 73, 0.1);
-}
-
-.cockpit-search__item img {
-  width: 48px;
-  height: 48px;
-  border-radius: 12px;
+.cockpit-select-option img {
+  width: 56px;
+  height: 56px;
+  border-radius: 10px;
   object-fit: cover;
-  background: rgba(49, 159, 73, 0.1);
+  background: rgba(49, 159, 73, 0.08);
 }
 
-.cockpit-search__item-title {
+.cockpit-select-option__title {
   margin: 0;
   font-weight: 600;
+  line-height: 1.25;
 }
 
-.cockpit-search__item-meta {
-  margin: 0;
+.cockpit-select-option__meta,
+.cockpit-select-option__description {
+  margin: 0.15rem 0 0;
   color: var(--clr-text-muted);
-  font-size: var(--font-size-sm);
+  font-size: 0.8rem;
 }
 
-.cockpit-search__combo strong {
-  margin-left: auto;
-}
-  border-radius: 999px;
-  border: 1px solid rgba(0, 0, 0, 0.15);
+.cockpit-select-option__description {
+  font-size: 0.78rem;
+  line-height: 1.3;
+  display: -webkit-box;
+  -webkit-box-orient: vertical;
+  -webkit-line-clamp: 2;
+  overflow: hidden;
 }
 
-.cockpit-search-row button,
 .cockpit-filter-row button,
 .cockpit-submit__actions button {
   border-radius: 999px;
@@ -147,7 +130,6 @@
   font-weight: 600;
 }
 
-.cockpit-search-row button.secondary,
 .cockpit-filter-row button.secondary,
 .cockpit-submit__actions button.secondary {
   background: #ffffff;
@@ -173,6 +155,7 @@
   height: 96px;
   border-radius: 16px;
   background: rgba(49, 159, 73, 0.12);
+  object-fit: cover;
 }
 
 .cockpit-product__title {

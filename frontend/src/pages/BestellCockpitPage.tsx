@@ -1,4 +1,5 @@
 import { useMemo, useState } from "react";
+import Select, { type SingleValue } from "react-select";
 import "../styles/BestellCockpitPage.css";
 
 const MOCK_PRODUCTS = [
@@ -22,22 +23,33 @@ const MOCK_PRODUCTS = [
   },
 ];
 
+type ProductOption = {
+  value: string;
+  label: string;
+  sku: string;
+  ean: string;
+  image: string;
+  price: number;
+  description: string;
+};
+
 export default function BestellCockpitPage() {
-  const [search, setSearch] = useState("");
-  const [isSearchFocused, setIsSearchFocused] = useState(false);
   const [selectedProductId, setSelectedProductId] = useState(MOCK_PRODUCTS[0].id);
   const [quantity, setQuantity] = useState(1);
 
-  const filteredProducts = useMemo(() => {
-    if (!search.trim()) return MOCK_PRODUCTS;
-    const term = search.toLowerCase();
-    return MOCK_PRODUCTS.filter(
-      (product) =>
-        product.title.toLowerCase().includes(term) ||
-        product.ean.includes(term) ||
-        product.sku.toLowerCase().includes(term)
-    );
-  }, [search]);
+  const productOptions: ProductOption[] = useMemo(
+    () =>
+      MOCK_PRODUCTS.map((product) => ({
+        value: product.id,
+        label: product.title,
+        sku: product.sku,
+        ean: product.ean,
+        image: product.image,
+        price: product.price,
+        description: product.description,
+      })),
+    []
+  );
 
   const selectedProduct =
     MOCK_PRODUCTS.find((product) => product.id === selectedProductId) ?? MOCK_PRODUCTS[0];
@@ -63,56 +75,45 @@ export default function BestellCockpitPage() {
         <div className="cockpit-panel__header">
           <h4>Produktsuche</h4>
         </div>
-        <div className="cockpit-search">
-          <label htmlFor="cockpit-query">EAN · SKU · Name</label>
-          <div className="cockpit-search__field">
-            <input
-              id="cockpit-query"
-              placeholder="z.B. Ferramol, 400524..."
-              value={search}
-              onChange={(event) => setSearch(event.target.value)}
-              onFocus={() => setIsSearchFocused(true)}
-              onBlur={() => setIsSearchFocused(false)}
-            />
-            {search && (
-              <button
-                type="button"
-                className="cockpit-search__clear"
-                onMouseDown={(event) => event.preventDefault()}
-                onClick={() => setSearch("")}
-                aria-label="Eingabe leeren"
-              >
-                ×
-              </button>
+        <div className="cockpit-select">
+          <label htmlFor="cockpit-select">EAN · SKU · Name</label>
+          <Select
+            inputId="cockpit-select"
+            classNamePrefix="rs"
+            options={productOptions}
+            value={productOptions.find((option) => option.value === selectedProductId)}
+            isSearchable
+            placeholder="Produkt auswählen…"
+            onChange={(option: SingleValue<ProductOption>) => {
+              if (option) {
+                setSelectedProductId(option.value);
+              }
+            }}
+            filterOption={(option, inputValue) => {
+              const term = inputValue.toLowerCase();
+              return (
+                option.label.toLowerCase().includes(term) ||
+                option.data.sku.toLowerCase().includes(term) ||
+                option.data.ean.includes(term)
+              );
+            }}
+            formatOptionLabel={(option) => (
+              <div className="cockpit-select-option">
+                <img src={option.image} alt="" aria-hidden="true" />
+                <div>
+                  <p className="cockpit-select-option__title">{option.label}</p>
+                  <p className="cockpit-select-option__meta">
+                    SKU {option.sku} · EAN {option.ean}
+                  </p>
+                  <p className="cockpit-select-option__description">{option.description}</p>
+                </div>
+                <strong>{option.price.toFixed(2)} €</strong>
+              </div>
             )}
-          </div>
-          {isSearchFocused && filteredProducts.length > 0 && (
-            <div className="cockpit-search__combo" role="listbox">
-              {filteredProducts.map((product) => (
-                <button
-                  key={product.id}
-                  type="button"
-                  className={`cockpit-search__item ${
-                    selectedProductId === product.id ? "is-selected" : ""
-                  }`}
-                  onMouseDown={(event) => event.preventDefault()}
-                  onClick={() => {
-                    setSelectedProductId(product.id);
-                    setSearch("");
-                  }}
-                >
-                  <img src={product.image} alt="" aria-hidden="true" />
-                  <div>
-                    <p className="cockpit-search__item-title">{product.title}</p>
-                    <p className="cockpit-search__item-meta">
-                      SKU {product.sku} · EAN {product.ean}
-                    </p>
-                  </div>
-                  <strong>{product.price.toFixed(2)} €</strong>
-                </button>
-              ))}
-            </div>
-          )}
+            components={{
+              IndicatorSeparator: () => null,
+            }}
+          />
         </div>
       </section>
 
@@ -122,11 +123,7 @@ export default function BestellCockpitPage() {
             <h4>Produkt</h4>
           </div>
           <div className="cockpit-product__preview">
-            <img
-              src={selectedProduct.image}
-              alt=""
-              className="cockpit-product__image"
-            />
+            <img src={selectedProduct.image} alt="" className="cockpit-product__image" />
             <div>
               <p className="cockpit-product__title">{selectedProduct.title}</p>
               <p className="cockpit-product__meta">
