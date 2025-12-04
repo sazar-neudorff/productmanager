@@ -3,33 +3,22 @@
 @import "./typography.css";
 
 .module-card {
-  background: #fffef3;
+  background: #ffffff;
   padding: 1.75rem;
   border-radius: 22px;
-  border: 1px solid rgba(71, 64, 48, 0.12);
-  box-shadow: 0 14px 30px rgba(0, 0, 0, 0.07);
-  transition: transform var(--transition-medium), box-shadow var(--transition-medium);
+  border: 2px solid rgba(49, 159, 73, 0.3);
+  box-shadow: 0 12px 28px rgba(0, 0, 0, 0.06);
+  transition: transform var(--transition-medium), box-shadow var(--transition-medium), border-color var(--transition-medium);
   display: flex;
   flex-direction: column;
   gap: 1.25rem;
   min-height: 220px;
 }
 
-.module-card--green {
-  background: linear-gradient(180deg, #e6f4ea 0%, #fffef3 90%);
-}
-
-.module-card--yellow {
-  background: linear-gradient(180deg, #ffee50 0%, #fffef3 100%);
-}
-
-.module-card--brown {
-  background: linear-gradient(180deg, #f0ece4 0%, #fffef3 95%);
-}
-
 .module-card:hover {
   transform: translateY(-8px);
   box-shadow: 0 24px 50px rgba(0, 0, 0, 0.12);
+  border-color: rgba(49, 159, 73, 0.6);
 }
 
 .module-card h3 {
@@ -47,9 +36,9 @@
 .module-card__cta {
   margin-top: auto;
   align-self: flex-start;
-  border: none;
-  background: #319f49;
-  color: #fff;
+  border: 1px solid #319f49;
+  background: transparent;
+  color: #319f49;
   font-weight: 600;
   border-radius: 999px;
   padding: 0.55rem 1.4rem;
@@ -60,4 +49,6 @@
 .module-card__cta:hover {
   transform: translateY(-2px);
   box-shadow: 0 10px 20px rgba(49, 159, 73, 0.25);
+  background: #319f49;
+  color: #fff;
 }

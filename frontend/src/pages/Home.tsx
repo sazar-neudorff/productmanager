@@ -3,9 +3,9 @@ import ModuleCard from "../components/ModuleCard";
 import "../styles/Home.css";
 
 const modules: ComponentProps<typeof ModuleCard>[] = [
-  { title: "Nützlingsportal Admin", caption: "Codes & Pflege", accent: "green" },
-  { title: "Produktmanagement", caption: "Daten & Assets", accent: "yellow" },
-  { title: "Bestell Cockpit", caption: "Aufträge & Routing", accent: "brown" },
+  { title: "Nützlingsportal Admin", caption: "Codes & Pflege" },
+  { title: "Produktmanagement", caption: "Daten & Assets" },
+  { title: "Bestell Cockpit", caption: "Aufträge & Routing" },
 ];
 
 export default function Home() {

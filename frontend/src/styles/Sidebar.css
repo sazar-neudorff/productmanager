@@ -5,14 +5,14 @@
 .portal-sidebar {
   width: 320px;
   min-height: 100%;
-  background: #f9f9f9;
+  background: linear-gradient(180deg, #f5ffe6 0%, #ffffff 70%);
   color: var(--clr-text-main);
   padding: 2rem 1.5rem;
   display: flex;
   flex-direction: column;
   gap: var(--space-lg);
-  border-right: 1px solid #ddd;
-  box-shadow: 0 0 20px rgba(0, 0, 0, 0.05);
+  border-right: 1px solid rgba(49, 159, 73, 0.2);
+  box-shadow: 0 0 25px rgba(0, 0, 0, 0.06);
   box-sizing: border-box;
 }
 
