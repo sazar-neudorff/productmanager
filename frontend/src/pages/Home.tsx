@@ -1,5 +1,6 @@
 import type { ComponentProps } from "react";
 import ModuleCard from "../components/ModuleCard";
+import ProductManagerLauncher from "../components/ProductManagerLauncher";
 import "../styles/Home.css";
 
 const modules: ComponentProps<typeof ModuleCard>[] = [
@@ -36,6 +37,15 @@ export default function Home() {
           {modules.map((module) => (
             <ModuleCard key={module.title} {...module} />
           ))}
+        </div>
+
+        <div className="product-launcher-wrapper">
+          <div className="product-launcher__tab-label">
+            <span className="product-launcher__tab-label-kicker">Produkt Management</span>
+            <h3>Produktmanager (Launcher)</h3>
+            <p>Öffnet die internen Module für Neudorff, Shopify, OBI und Bauhaus.</p>
+          </div>
+          <ProductManagerLauncher />
         </div>
       </section>
     </div>
