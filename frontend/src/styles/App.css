@@ -4,8 +4,11 @@
 
 .app-shell {
   min-height: 100vh;
+  width: 100%;
   display: flex;
-  background: var(--clr-surface);
+  justify-content: center;
+  padding: clamp(1rem, 3vw, 2.5rem);
+  background: var(--clr-background-base);
   color: var(--clr-text-main);
   font-family: var(--font-main);
   position: relative;
@@ -15,49 +18,84 @@
 .app-shell::before,
 .app-shell::after {
   content: "";
-  position: fixed;
-  width: 420px;
-  height: 420px;
-  background: radial-gradient(circle, rgba(255, 232, 120, 0.25), transparent 70%);
+  position: absolute;
+  width: 480px;
+  height: 480px;
+  background: radial-gradient(circle, rgba(255, 232, 120, 0.18), transparent 70%);
   z-index: 0;
   pointer-events: none;
 }
 
 .app-shell::before {
-  top: -140px;
-  right: -80px;
+  top: -160px;
+  right: -60px;
 }
 
 .app-shell::after {
-  bottom: -120px;
-  left: -80px;
+  bottom: -150px;
+  left: -90px;
+}
+
+.admin-container {
+  position: relative;
+  z-index: 1;
+  display: flex;
+  width: 100%;
+  max-width: 1480px;
+  min-height: calc(100vh - clamp(2rem, 6vw, 4rem));
+  background: #ffffff;
+  border-radius: 28px;
+  box-shadow: 0 20px 55px rgba(0, 0, 0, 0.08);
+  overflow: hidden;
+  border: 1px solid rgba(71, 64, 48, 0.08);
 }
 
 .app-main {
   flex: 1;
-  min-height: 100vh;
+  min-height: 100%;
   display: flex;
   flex-direction: column;
-  background: transparent;
+  background: linear-gradient(180deg, #fffef3 0%, #ffffff 100%);
+}
+
+.admin-content {
   position: relative;
-  z-index: 1;
+  flex: 1;
+  overflow: auto;
+}
+
+.admin-content__inner {
+  min-height: 100%;
+  display: flex;
+  flex-direction: column;
+  padding: clamp(1.5rem, 2vw, 2.75rem);
+  background: linear-gradient(180deg, #fffef3 0%, #ffffff 55%);
 }
 
 .app-content {
   flex: 1;
   width: 100%;
-  max-width: var(--layout-content-width);
   margin: 0 auto;
-  padding: var(--space-2xl);
+  margin-top: var(--space-xl);
+  padding: clamp(1.5rem, 2.5vw, 3rem);
+  background: #ffffff;
+  border-radius: 24px;
+  border: 1px solid rgba(71, 64, 48, 0.1);
+  box-shadow: 0 25px 60px rgba(0, 0, 0, 0.08);
 }
 
 @media (max-width: 1200px) {
   .app-shell {
-    flex-direction: column;
+    padding: 0;
   }
 
-  .app-main {
-    padding-top: var(--space-lg);
+  .admin-container {
+    flex-direction: column;
+    border-radius: 0;
+  }
+
+  .admin-content__inner {
+    padding: var(--space-lg);
   }
 
   .app-content {
