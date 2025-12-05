@@ -204,12 +204,36 @@
   gap: var(--space-lg);
 }
 
-.cockpit-address__forms input,
+.cockpit-address-grid {
+  display: grid;
+  gap: var(--space-md);
+}
+
+.cockpit-field {
+  display: flex;
+  flex-direction: column;
+  gap: 0.25rem;
+}
+
+.cockpit-field input,
+.cockpit-field select,
 .cockpit-submit textarea {
   width: 100%;
   padding: 0.55rem 0.8rem;
   border-radius: 12px;
   border: 1px solid rgba(0, 0, 0, 0.12);
+}
+
+.cockpit-field-group {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+  gap: var(--space-sm);
+}
+
+.cockpit-error {
+  margin: 0;
+  color: #c62828;
+  font-size: 0.8rem;
 }
 
 .cockpit-submit__grid {
