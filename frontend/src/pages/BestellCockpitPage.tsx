@@ -36,6 +36,7 @@ type ProductOption = {
 export default function BestellCockpitPage() {
   const [selectedProductId, setSelectedProductId] = useState(MOCK_PRODUCTS[0].id);
   const [quantity, setQuantity] = useState(1);
+  const [selectInputValue, setSelectInputValue] = useState("");
 
   const productOptions: ProductOption[] = useMemo(
     () =>
@@ -81,12 +82,21 @@ export default function BestellCockpitPage() {
             inputId="cockpit-select"
             classNamePrefix="rs"
             options={productOptions}
-            value={productOptions.find((option) => option.value === selectedProductId)}
             isSearchable
             placeholder="Produkt auswählen…"
+            value={null}
+            inputValue={selectInputValue}
+            onInputChange={(value, { action }) => {
+              if (action === "input-change") {
+                setSelectInputValue(value);
+              } else if (action === "menu-close") {
+                setSelectInputValue("");
+              }
+            }}
             onChange={(option: SingleValue<ProductOption>) => {
               if (option) {
                 setSelectedProductId(option.value);
+                setSelectInputValue("");
               }
             }}
             filterOption={(option, inputValue) => {
