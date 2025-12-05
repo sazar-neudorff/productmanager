@@ -33,10 +33,40 @@ type ProductOption = {
   description: string;
 };
 
+type Address = {
+  salutation: string;
+  firstName: string;
+  lastName: string;
+  company: string;
+  street: string;
+  number: string;
+  zip: string;
+  city: string;
+  country: "de" | "at";
+  email: string;
+  phone: string;
+};
+
 export default function BestellCockpitPage() {
   const [selectedProductId, setSelectedProductId] = useState(MOCK_PRODUCTS[0].id);
   const [quantity, setQuantity] = useState(1);
   const [selectInputValue, setSelectInputValue] = useState("");
+  const [address, setAddress] = useState<Address>({
+    salutation: "",
+    firstName: "",
+    lastName: "",
+    company: "",
+    street: "",
+    number: "",
+    zip: "",
+    city: "",
+    country: "de",
+    email: "",
+    phone: "",
+  });
+  const [addressErrors, setAddressErrors] = useState<Record<keyof Address, string | undefined>>(
+    {} as Record<keyof Address, string | undefined>
+  );
 
   const productOptions: ProductOption[] = useMemo(
     () =>
@@ -58,6 +88,78 @@ export default function BestellCockpitPage() {
   const totalPrice = useMemo(() => {
     return (selectedProduct.price * quantity).toFixed(2);
   }, [selectedProduct.price, quantity]);
+
+  const setAddressError = (name: keyof Address, message?: string) => {
+    setAddressErrors((prev) => ({ ...prev, [name]: message }));
+  };
+
+  const deriveCountryFromZip = (zip: string) => {
+    if (/^\d{4}$/.test(zip)) return "at";
+    if (/^\d{5}$/.test(zip)) return "de";
+    return undefined;
+  };
+
+  const validateAddressField = (name: keyof Address, value: string) => {
+    if (["firstName", "lastName"].includes(name) && address.salutation !== "Firma" && !value.trim()) {
+      return "Pflichtfeld";
+    }
+    if (name === "lastName" && !value.trim()) return "Pflichtfeld";
+    if (name === "street" && !value.trim()) return "Pflichtfeld";
+    if (name === "number") {
+      if (!value.trim()) return "Pflichtfeld";
+      if (!/^\d{1,4}[a-zA-Z]?(?:[-/]\d{1,3}[a-zA-Z]?)?$/.test(value.trim())) {
+        return "Bitte gültige Hausnummer angeben.";
+      }
+    }
+    if (name === "zip") {
+      if (!value.trim()) return "Pflichtfeld";
+      if (!/^\d{4,5}$/.test(value.trim())) return "Ungültige PLZ";
+      const inferred = deriveCountryFromZip(value.trim());
+      if (inferred && inferred !== address.country) {
+        setAddress((prev) => ({ ...prev, country: inferred }));
+      }
+    }
+    if (name === "city" && !value.trim()) return "Pflichtfeld";
+    if (name === "email") {
+      if (!value.trim()) return "Pflichtfeld";
+      if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(value.trim())) return "Ungültige E-Mail";
+    }
+    if (name === "phone" && value.trim() && !/^[\d\s/+-]+$/.test(value.trim())) {
+      return "Nur Ziffern und +-/, erlaubt";
+    }
+    if (name === "salutation" && !value.trim()) return "Pflichtfeld";
+    return undefined;
+  };
+
+  const handleAddressChange = (
+    name: keyof Address,
+    value: string,
+    opts?: { validate?: boolean }
+  ) => {
+    setAddress((prev) => ({ ...prev, [name]: value }));
+    if (opts?.validate) {
+      const error = validateAddressField(name, value);
+      setAddressError(name, error);
+    }
+  };
+
+  const validateAddress = () => {
+    const nextErrors: typeof addressErrors = {} as typeof addressErrors;
+    (Object.keys(address) as (keyof Address)[]).forEach((key) => {
+      const message = validateAddressField(key, address[key] ?? "");
+      if (message) nextErrors[key] = message;
+    });
+    setAddressErrors(nextErrors);
+    return Object.values(nextErrors).every((msg) => !msg);
+  };
+
+  const handleSubmitOrder = () => {
+    if (!validateAddress()) {
+      return;
+    }
+    // Placeholder submission logic
+    alert("Bestellung gesendet (Demo)");
+  };
 
   return (
     <div className="cockpit-page">
@@ -186,25 +288,128 @@ export default function BestellCockpitPage() {
         <div className="cockpit-panel__header">
           <h4>Adresse</h4>
         </div>
-        <div className="cockpit-address__forms">
-          <div>
-            <p className="cockpit-address__label">Lieferadresse</p>
-            <label htmlFor="lieferfirma">Firma</label>
-            <input id="lieferfirma" placeholder="Firma / Ansprechpartner" />
-            <label htmlFor="lieferanschrift">Straße · Nr.</label>
-            <input id="lieferanschrift" placeholder="Musterstraße 12" />
-            <label htmlFor="lieferort">PLZ · Ort</label>
-            <input id="lieferort" placeholder="12345 Gartenstadt" />
+        <div className="cockpit-address-grid">
+          <div className="cockpit-field">
+            <label>Anrede*</label>
+            <select
+              value={address.salutation}
+              onChange={(event) => handleAddressChange("salutation", event.target.value, { validate: true })}
+            >
+              <option value="">Bitte wählen</option>
+              <option value="Frau">Frau</option>
+              <option value="Herr">Herr</option>
+              <option value="Firma">Firma</option>
+              <option value="Divers">Divers</option>
+            </select>
+            {addressErrors.salutation && <p className="cockpit-error">{addressErrors.salutation}</p>}
           </div>
 
-          <div>
-            <p className="cockpit-address__label">Rechnungsadresse</p>
-            <label htmlFor="rechnungfirma">Firma</label>
-            <input id="rechnungfirma" placeholder="Firma / Ansprechpartner" />
-            <label htmlFor="rechnunganschrift">Straße · Nr.</label>
-            <input id="rechnunganschrift" placeholder="Musterstraße 1" />
-            <label htmlFor="rechnungort">PLZ · Ort</label>
-            <input id="rechnungort" placeholder="12345 Gartenstadt" />
+          <div className="cockpit-field-group">
+            <div className="cockpit-field">
+              <label>Vorname{address.salutation !== "Firma" && "*"}</label>
+              <input
+                value={address.firstName}
+                onChange={(event) => handleAddressChange("firstName", event.target.value)}
+                onBlur={(event) => handleAddressChange("firstName", event.target.value, { validate: true })}
+              />
+              {addressErrors.firstName && <p className="cockpit-error">{addressErrors.firstName}</p>}
+            </div>
+            <div className="cockpit-field">
+              <label>Nachname*</label>
+              <input
+                value={address.lastName}
+                onChange={(event) => handleAddressChange("lastName", event.target.value)}
+                onBlur={(event) => handleAddressChange("lastName", event.target.value, { validate: true })}
+              />
+              {addressErrors.lastName && <p className="cockpit-error">{addressErrors.lastName}</p>}
+            </div>
+          </div>
+
+          {address.salutation !== "Firma" && (
+            <div className="cockpit-field">
+              <label>Firma (optional)</label>
+              <input
+                value={address.company}
+                onChange={(event) => handleAddressChange("company", event.target.value)}
+              />
+            </div>
+          )}
+
+          <div className="cockpit-field-group">
+            <div className="cockpit-field">
+              <label>Straße*</label>
+              <input
+                value={address.street}
+                onChange={(event) => handleAddressChange("street", event.target.value)}
+                onBlur={(event) => handleAddressChange("street", event.target.value, { validate: true })}
+              />
+              {addressErrors.street && <p className="cockpit-error">{addressErrors.street}</p>}
+            </div>
+            <div className="cockpit-field">
+              <label>Nr.*</label>
+              <input
+                value={address.number}
+                onChange={(event) => handleAddressChange("number", event.target.value)}
+                onBlur={(event) => handleAddressChange("number", event.target.value, { validate: true })}
+              />
+              {addressErrors.number && <p className="cockpit-error">{addressErrors.number}</p>}
+            </div>
+          </div>
+
+          <div className="cockpit-field-group">
+            <div className="cockpit-field">
+              <label>PLZ*</label>
+              <input
+                value={address.zip}
+                onChange={(event) => handleAddressChange("zip", event.target.value)}
+                onBlur={(event) => handleAddressChange("zip", event.target.value, { validate: true })}
+              />
+              {addressErrors.zip && <p className="cockpit-error">{addressErrors.zip}</p>}
+            </div>
+            <div className="cockpit-field">
+              <label>Ort*</label>
+              <input
+                value={address.city}
+                onChange={(event) => handleAddressChange("city", event.target.value)}
+                onBlur={(event) => handleAddressChange("city", event.target.value, { validate: true })}
+              />
+              {addressErrors.city && <p className="cockpit-error">{addressErrors.city}</p>}
+            </div>
+          </div>
+
+          <div className="cockpit-field">
+            <label>Land*</label>
+            <select
+              value={address.country}
+              onChange={(event) =>
+                handleAddressChange("country", event.target.value as "de" | "at", { validate: true })
+              }
+            >
+              <option value="de">Deutschland</option>
+              <option value="at">Österreich</option>
+            </select>
+            {addressErrors.country && <p className="cockpit-error">{addressErrors.country}</p>}
+          </div>
+
+          <div className="cockpit-field">
+            <label>E-Mail*</label>
+            <input
+              type="email"
+              value={address.email}
+              onChange={(event) => handleAddressChange("email", event.target.value)}
+              onBlur={(event) => handleAddressChange("email", event.target.value, { validate: true })}
+            />
+            {addressErrors.email && <p className="cockpit-error">{addressErrors.email}</p>}
+          </div>
+
+          <div className="cockpit-field">
+            <label>Telefon</label>
+            <input
+              value={address.phone}
+              onChange={(event) => handleAddressChange("phone", event.target.value)}
+              onBlur={(event) => handleAddressChange("phone", event.target.value, { validate: true })}
+            />
+            {addressErrors.phone && <p className="cockpit-error">{addressErrors.phone}</p>}
           </div>
         </div>
       </section>
@@ -219,7 +424,9 @@ export default function BestellCockpitPage() {
             <button type="button" className="secondary">
               Entwurf sichern
             </button>
-            <button type="button">Abschicken</button>
+            <button type="button" onClick={handleSubmitOrder}>
+              Abschicken
+            </button>
           </div>
         </div>
       </section>
