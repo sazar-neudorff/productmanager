@@ -3,14 +3,21 @@ import PortalSidebar from "./components/PortalSidebar";
 import Home from "./pages/Home";
 import ProductManagementPage from "./pages/ProductManagementPage";
 import BestellCockpitPage from "./pages/BestellCockpitPage";
+import AutomationsPage from "./pages/AutomationsPage";
 
-type ViewId = "home" | "product-management" | "nuetzlingsportal" | "bestell-cockpit";
+type ViewId =
+  | "home"
+  | "product-management"
+  | "nuetzlingsportal"
+  | "bestell-cockpit"
+  | "automations";
 
 const NAV_ITEMS: Array<{ id: ViewId; label: string; description: string }> = [
   { id: "home", label: "Start", description: "Übersicht & Module" },
   { id: "product-management", label: "Produktmanagement", description: "Exporte & Shops" },
   { id: "nuetzlingsportal", label: "Nützlingsportal", description: "Codes & Wartung" },
   { id: "bestell-cockpit", label: "Bestell Cockpit", description: "Aufträge & Routing" },
+  { id: "automations", label: "Automatisierungen", description: "Jobs & Status" },
 ];
 const isViewId = (value: string): value is ViewId =>
   NAV_ITEMS.some((item) => item.id === value);
@@ -36,6 +43,8 @@ export default function App() {
         return <ProductManagementPage />;
       case "bestell-cockpit":
         return <BestellCockpitPage />;
+      case "automations":
+        return <AutomationsPage />;
       case "home":
         return <Home onSelectModule={handleModuleSelect} />;
       case "nuetzlingsportal":

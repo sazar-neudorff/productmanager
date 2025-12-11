@@ -10,6 +10,7 @@ const modules: ModuleConfig[] = [
   { id: "nuetzlingsportal", title: "Nützlingsportal Admin", caption: "Codes & Pflege" },
   { id: "product-management", title: "Produktmanagement", caption: "Daten & Assets" },
   { id: "bestell-cockpit", title: "Bestell Cockpit", caption: "Aufträge & Routing" },
+  { id: "automations", title: "Automatisierungen", caption: "Jobs & Status" },
 ];
 
 interface HomeProps {
