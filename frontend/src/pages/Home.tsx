@@ -29,7 +29,7 @@ export default function Home({ onSelectModule }: HomeProps) {
             braucht. Wähle einen Bereich aus und du landest direkt in der
             passenden App.
           </p>
-          <p className="hero-handwriting">Alles für Neodorff.</p>
+          <p className="hero-handwriting">Alles für Neudorff.</p>
         </div>
       </section>
 
