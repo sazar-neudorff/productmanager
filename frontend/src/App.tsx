@@ -15,7 +15,6 @@ type ViewId =
 const NAV_ITEMS: Array<{ id: ViewId; label: string; description: string }> = [
   { id: "home", label: "Start", description: "Übersicht & Module" },
   { id: "product-management", label: "Produktmanagement", description: "Exporte & Shops" },
-  { id: "nuetzlingsportal", label: "Nützlingsportal", description: "Codes & Wartung" },
   { id: "bestell-cockpit", label: "Bestell Cockpit", description: "Aufträge & Routing" },
   { id: "automations", label: "Automatisierungen", description: "Jobs & Status" },
 ];

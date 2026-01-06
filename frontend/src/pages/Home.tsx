@@ -7,7 +7,6 @@ type ModuleConfig = ComponentProps<typeof ModuleCard> & {
 };
 
 const modules: ModuleConfig[] = [
-  { id: "nuetzlingsportal", title: "Nützlingsportal Admin", caption: "Codes & Pflege" },
   { id: "product-management", title: "Produktmanagement", caption: "Daten & Assets" },
   { id: "bestell-cockpit", title: "Bestell Cockpit", caption: "Aufträge & Routing" },
   { id: "automations", title: "Automatisierungen", caption: "Jobs & Status" },
@@ -30,7 +29,7 @@ export default function Home({ onSelectModule }: HomeProps) {
             braucht. Wähle einen Bereich aus und du landest direkt in der
             passenden App.
           </p>
-          <p className="hero-handwriting">Alles für das Nützlingsportal an einem Ort.</p>
+          <p className="hero-handwriting">Alles für Neodorff.</p>
         </div>
       </section>
 
