@@ -1,4 +1,5 @@
 from __future__ import annotations
+from flask_cors import CORS
 
 import os
 from flask import Flask
@@ -9,6 +10,7 @@ from .routes import api_bp
 def create_app(config_name: str | None = None) -> Flask:
     """Application factory used by Flask scripts and the WSGI server."""
     app = Flask(__name__)
+    CORS(app, resources={r"/api/*": {"origins": "*"}})
 
     config_name = config_name or os.getenv("FLASK_ENV", "development")
     app.config.from_object(get_config_object(config_name))
