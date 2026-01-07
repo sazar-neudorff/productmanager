@@ -39,13 +39,19 @@ type Address = {
 const API_BASE = import.meta.env.VITE_API_BASE_URL ?? "";
 
 export default function BestellCockpitPage() {
-  const [products, setProducts] = useState<Product[]>([]);
-  const [selectedProductId, setSelectedProductId] = useState<string>("");
+  const [selectedProduct, setSelectedProduct] = useState<Product | null>(null);
   const [quantity, setQuantity] = useState(1);
 
-  // react-select: Text im Suchfeld
+  // react-select (nur Suchtext)
   const [selectInputValue, setSelectInputValue] = useState("");
 
+  // Dropdown Optionen + Pagination
+  const [options, setOptions] = useState<ProductOption[]>([]);
+  const [nextCursor, setNextCursor] = useState<string | null>(null);
+  const [hasNextPage, setHasNextPage] = useState(false);
+  const [loadingOptions, setLoadingOptions] = useState(false);
+
+  // Start: initiales Default-Produkt laden (optional)
   const [loadingProducts, setLoadingProducts] = useState(true);
   const [productsError, setProductsError] = useState<string | null>(null);
 
@@ -67,7 +73,7 @@ export default function BestellCockpitPage() {
     {} as Record<keyof Address, string | undefined>
   );
 
-  // Produkte vom Backend laden
+  // Initial: ein Produkt zum Anzeigen holen (erste 20 -> nimm erstes)
   useEffect(() => {
     (async () => {
       try {
@@ -80,8 +86,7 @@ export default function BestellCockpitPage() {
         const data = await res.json();
         const items: Product[] = data.items ?? [];
 
-        setProducts(items);
-        setSelectedProductId(items[0]?.id ?? "");
+        setSelectedProduct(items[0] ?? null);
       } catch (err) {
         setProductsError(err instanceof Error ? err.message : "Unbekannter Fehler");
       } finally {
@@ -90,24 +95,43 @@ export default function BestellCockpitPage() {
     })();
   }, []);
 
-  const productOptions: ProductOption[] = useMemo(
-    () =>
-      products.map((product) => ({
-        value: product.id,
-        label: product.title,
-        sku: product.sku,
-        ean: product.ean,
-        image: product.image,
-        price: product.price,
-        description: product.description,
-      })),
-    [products]
-  );
+  const loadOptions = async (q: string, after?: string | null, append?: boolean) => {
+    setLoadingOptions(true);
+    try {
+      const url = new URL(`${API_BASE}/api/products/search`);
+      url.searchParams.set("q", q);
+      url.searchParams.set("first", "20");
+      if (after) url.searchParams.set("after", after);
 
-  const selectedProduct = useMemo(
-    () => products.find((p) => p.id === selectedProductId) ?? null,
-    [products, selectedProductId]
-  );
+      const res = await fetch(url.toString());
+      if (!res.ok) throw new Error(`HTTP ${res.status}`);
+      const data = await res.json();
+
+      const newOptions: ProductOption[] = (data.items ?? []).map((p: Product) => ({
+        value: p.id,
+        label: p.title,
+        sku: p.sku,
+        ean: p.ean,
+        image: p.image,
+        price: p.price,
+        description: p.description,
+      }));
+
+      setOptions((prev) => (append ? [...prev, ...newOptions] : newOptions));
+      setHasNextPage(Boolean(data.pageInfo?.hasNextPage));
+      setNextCursor(data.pageInfo?.endCursor ?? null);
+    } finally {
+      setLoadingOptions(false);
+    }
+  };
+
+  // Debounce: Backend Suche über alle Produkte
+  useEffect(() => {
+    const t = setTimeout(() => {
+      loadOptions(selectInputValue, null, false);
+    }, 250);
+    return () => clearTimeout(t);
+  }, [selectInputValue]);
 
   const totalPrice = useMemo(() => {
     if (!selectedProduct) return "0.00";
@@ -179,10 +203,8 @@ export default function BestellCockpitPage() {
     alert("Bestellung gesendet (Demo)");
   };
 
-  // UI States für Produkte
-  if (loadingProducts) {
-    return <div style={{ padding: 24 }}>Lade Produkte…</div>;
-  }
+  // UI States
+  if (loadingProducts) return <div style={{ padding: 24 }}>Lade Produkte…</div>;
   if (productsError) {
     return (
       <div style={{ padding: 24 }}>
@@ -191,9 +213,7 @@ export default function BestellCockpitPage() {
       </div>
     );
   }
-  if (!selectedProduct) {
-    return <div style={{ padding: 24 }}>Keine Produkte gefunden.</div>;
-  }
+  if (!selectedProduct) return <div style={{ padding: 24 }}>Keine Produkte gefunden.</div>;
 
   return (
     <div className="cockpit-page">
@@ -208,7 +228,6 @@ export default function BestellCockpitPage() {
         </div>
       </header>
 
-      {/* Produktsuche */}
       <section className="cockpit-panel">
         <div className="cockpit-panel__header">
           <h4>Produktsuche</h4>
@@ -217,34 +236,46 @@ export default function BestellCockpitPage() {
         <div className="cockpit-select">
           <label htmlFor="cockpit-select">EAN · SKU · Name</label>
 
-          {/* WICHTIG: value={null} + controlShouldRenderValue={false} => Feld bleibt leer */}
           <Select
             inputId="cockpit-select"
             classNamePrefix="rs"
-            options={productOptions}
+            options={options}
             isSearchable
             placeholder="Produkt suchen…"
             value={null}
             controlShouldRenderValue={false}
             inputValue={selectInputValue}
+            isLoading={loadingOptions}
+            noOptionsMessage={() => (selectInputValue ? "Keine Treffer" : "Tippe zum Suchen…")}
             onInputChange={(value, { action }) => {
               if (action === "input-change") setSelectInputValue(value);
               if (action === "menu-close") setSelectInputValue("");
             }}
-            onChange={(option: SingleValue<ProductOption>) => {
-              if (option) {
-                setSelectedProductId(option.value);
-                setSelectInputValue(""); // nach Auswahl wieder leer
+            onMenuOpen={() => {
+              if (options.length === 0) loadOptions("", null, false);
+            }}
+            onMenuScrollToBottom={() => {
+              if (hasNextPage && !loadingOptions) {
+                loadOptions(selectInputValue, nextCursor, true);
               }
             }}
-            filterOption={(option, inputValue) => {
-              const term = inputValue.toLowerCase();
-              return (
-                option.label.toLowerCase().includes(term) ||
-                option.data.sku.toLowerCase().includes(term) ||
-                option.data.ean.includes(term)
-              );
+            onChange={(option: SingleValue<ProductOption>) => {
+              if (option) {
+                // Ausgewähltes Produkt direkt aus Option bauen (keine extra API nötig)
+                setSelectedProduct({
+                  id: option.value,
+                  title: option.label,
+                  sku: option.sku,
+                  ean: option.ean,
+                  image: option.image,
+                  price: option.price,
+                  description: option.description,
+                });
+                setQuantity(1);
+                setSelectInputValue(""); // Suchfeld wieder leer
+              }
             }}
+            filterOption={() => true} // Backend macht Suche, nicht react-select
             formatOptionLabel={(option) => (
               <div className="cockpit-select-option">
                 <img src={option.image} alt="" aria-hidden="true" />
@@ -260,30 +291,9 @@ export default function BestellCockpitPage() {
             )}
             components={{ IndicatorSeparator: () => null }}
           />
-
-          {/* Karte direkt unter der Suche */}
-          <div className="cockpit-selected-card" style={{ marginTop: 12 }}>
-            <img
-              src={selectedProduct.image}
-              alt=""
-              aria-hidden="true"
-              style={{ width: 52, height: 52, objectFit: "cover", borderRadius: 10 }}
-            />
-            <div style={{ minWidth: 0 }}>
-              <p style={{ margin: 0, fontWeight: 700 }}>{selectedProduct.title}</p>
-              <p style={{ margin: "4px 0", opacity: 0.8 }}>
-                SKU {selectedProduct.sku} · EAN {selectedProduct.ean}
-              </p>
-              <p style={{ margin: 0, opacity: 0.8, overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap" }}>
-                {selectedProduct.description}
-              </p>
-            </div>
-            <strong style={{ whiteSpace: "nowrap" }}>{selectedProduct.price.toFixed(2)} €</strong>
-          </div>
         </div>
       </section>
 
-      {/* Produkt + Kosten */}
       <section className="cockpit-panel cockpit-layout">
         <div className="cockpit-product">
           <div className="cockpit-panel__header">
@@ -334,7 +344,9 @@ export default function BestellCockpitPage() {
         </div>
       </section>
 
-      {/* Adresse */}
+      {/* Adresse + Bestellung bleibt wie gehabt (du kannst den Rest aus deiner Datei übernehmen) */}
+      {/* --- ab hier unverändert --- */}
+
       <section className="cockpit-panel cockpit-address">
         <div className="cockpit-panel__header">
           <h4>Adresse</h4>
@@ -460,7 +472,6 @@ export default function BestellCockpitPage() {
         </div>
       </section>
 
-      {/* Bestellung */}
       <section className="cockpit-panel cockpit-submit">
         <div className="cockpit-panel__header">
           <h4>Bestellung</h4>
