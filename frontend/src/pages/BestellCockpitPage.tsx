@@ -1,27 +1,16 @@
-import { useMemo, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 import Select, { type SingleValue } from "react-select";
 import "../styles/BestellCockpitPage.css";
 
-const MOCK_PRODUCTS = [
-  {
-    id: "p-0001",
-  title: "Ferramol Schneckenkorn",
-  sku: "ND-4100",
-  ean: "400524000410",
-  price: 12.99,
-  description: "Biologisches Schneckenkorn mit Eisen-III-Phosphat.",
-    image: "https://api.neudorff.de/fileadmin/media-pim/bild_1.png",
-  },
-  {
-    id: "p-0002",
-    title: "Finalsan AF UnkrautFrei",
-    sku: "ND-4105",
-    ean: "400524000415",
-    price: 9.49,
-    description: "Anwendungsfertiger Unkrautvernichter für Wege und Plätze.",
-    image: "https://api.neudorff.de/fileadmin/media-pim/bild_2.png",
-  },
-];
+type Product = {
+  id: string;
+  title: string;
+  sku: string;
+  ean: string;
+  image: string;
+  price: number;
+  description: string;
+};
 
 type ProductOption = {
   value: string;
@@ -47,10 +36,16 @@ type Address = {
   phone: string;
 };
 
+const API_BASE = import.meta.env.VITE_API_BASE_URL ?? "";
+
 export default function BestellCockpitPage() {
-  const [selectedProductId, setSelectedProductId] = useState(MOCK_PRODUCTS[0].id);
+  const [products, setProducts] = useState<Product[]>([]);
+  const [selectedProductId, setSelectedProductId] = useState<string>("");
   const [quantity, setQuantity] = useState(1);
   const [selectInputValue, setSelectInputValue] = useState("");
+  const [loadingProducts, setLoadingProducts] = useState(true);
+  const [productsError, setProductsError] = useState<string | null>(null);
+
   const [address, setAddress] = useState<Address>({
     salutation: "",
     firstName: "",
@@ -64,13 +59,37 @@ export default function BestellCockpitPage() {
     email: "",
     phone: "",
   });
+
   const [addressErrors, setAddressErrors] = useState<Record<keyof Address, string | undefined>>(
     {} as Record<keyof Address, string | undefined>
   );
 
+  // Produkte vom Backend laden
+  useEffect(() => {
+    (async () => {
+      try {
+        setLoadingProducts(true);
+        setProductsError(null);
+
+        const res = await fetch(`${API_BASE}/api/products`);
+        if (!res.ok) throw new Error(`HTTP ${res.status}`);
+
+        const data = await res.json();
+        const items: Product[] = data.items ?? [];
+
+        setProducts(items);
+        setSelectedProductId(items[0]?.id ?? "");
+      } catch (err) {
+        setProductsError(err instanceof Error ? err.message : "Unbekannter Fehler");
+      } finally {
+        setLoadingProducts(false);
+      }
+    })();
+  }, []);
+
   const productOptions: ProductOption[] = useMemo(
     () =>
-      MOCK_PRODUCTS.map((product) => ({
+      products.map((product) => ({
         value: product.id,
         label: product.title,
         sku: product.sku,
@@ -79,15 +98,23 @@ export default function BestellCockpitPage() {
         price: product.price,
         description: product.description,
       })),
-    []
+    [products]
   );
 
-  const selectedProduct =
-    MOCK_PRODUCTS.find((product) => product.id === selectedProductId) ?? MOCK_PRODUCTS[0];
+  const selectedOption = useMemo(
+    () => productOptions.find((o) => o.value === selectedProductId) ?? null,
+    [productOptions, selectedProductId]
+  );
+
+  const selectedProduct = useMemo(
+    () => products.find((p) => p.id === selectedProductId) ?? null,
+    [products, selectedProductId]
+  );
 
   const totalPrice = useMemo(() => {
+    if (!selectedProduct) return "0.00";
     return (selectedProduct.price * quantity).toFixed(2);
-  }, [selectedProduct.price, quantity]);
+  }, [selectedProduct, quantity]);
 
   const setAddressError = (name: keyof Address, message?: string) => {
     setAddressErrors((prev) => ({ ...prev, [name]: message }));
@@ -131,11 +158,7 @@ export default function BestellCockpitPage() {
     return undefined;
   };
 
-  const handleAddressChange = (
-    name: keyof Address,
-    value: string,
-    opts?: { validate?: boolean }
-  ) => {
+  const handleAddressChange = (name: keyof Address, value: string, opts?: { validate?: boolean }) => {
     setAddress((prev) => ({ ...prev, [name]: value }));
     if (opts?.validate) {
       const error = validateAddressField(name, value);
@@ -154,12 +177,25 @@ export default function BestellCockpitPage() {
   };
 
   const handleSubmitOrder = () => {
-    if (!validateAddress()) {
-      return;
-    }
-    // Placeholder submission logic
+    if (!validateAddress()) return;
     alert("Bestellung gesendet (Demo)");
   };
+
+  // UI States für Produkte
+  if (loadingProducts) {
+    return <div style={{ padding: 24 }}>Lade Produkte…</div>;
+  }
+  if (productsError) {
+    return (
+      <div style={{ padding: 24 }}>
+        <p style={{ marginBottom: 8 }}>Produkte konnten nicht geladen werden.</p>
+        <code>{productsError}</code>
+      </div>
+    );
+  }
+  if (!selectedProduct) {
+    return <div style={{ padding: 24 }}>Keine Produkte gefunden.</div>;
+  }
 
   return (
     <div className="cockpit-page">
@@ -186,7 +222,7 @@ export default function BestellCockpitPage() {
             options={productOptions}
             isSearchable
             placeholder="Produkt auswählen…"
-            value={null}
+            value={selectedOption}
             inputValue={selectInputValue}
             onInputChange={(value, { action }) => {
               if (action === "input-change") {
@@ -256,12 +292,7 @@ export default function BestellCockpitPage() {
             />
 
             <label htmlFor="cockpit-price">Einzelpreis</label>
-            <input
-              id="cockpit-price"
-              type="text"
-              value={`${selectedProduct.price.toFixed(2)} €`}
-              readOnly
-            />
+            <input id="cockpit-price" type="text" value={`${selectedProduct.price.toFixed(2)} €`} readOnly />
           </div>
         </div>
 
@@ -269,18 +300,18 @@ export default function BestellCockpitPage() {
           <div className="cockpit-panel__header">
             <h4>Kosten</h4>
           </div>
-        <div className="cockpit-costs__row">
-          <span>Zwischensumme</span>
-          <strong>{(selectedProduct.price * quantity).toFixed(2)} €</strong>
-        </div>
-        <div className="cockpit-costs__row">
-          <span>Versand</span>
-          <strong>0,00 €</strong>
-        </div>
-        <div className="cockpit-costs__row is-total">
-          <span>Gesamt</span>
-          <strong>{totalPrice} €</strong>
-        </div>
+          <div className="cockpit-costs__row">
+            <span>Zwischensumme</span>
+            <strong>{(selectedProduct.price * quantity).toFixed(2)} €</strong>
+          </div>
+          <div className="cockpit-costs__row">
+            <span>Versand</span>
+            <strong>0,00 €</strong>
+          </div>
+          <div className="cockpit-costs__row is-total">
+            <span>Gesamt</span>
+            <strong>{totalPrice} €</strong>
+          </div>
         </div>
       </section>
 
@@ -328,10 +359,7 @@ export default function BestellCockpitPage() {
           {address.salutation !== "Firma" && (
             <div className="cockpit-field">
               <label>Firma (optional)</label>
-              <input
-                value={address.company}
-                onChange={(event) => handleAddressChange("company", event.target.value)}
-              />
+              <input value={address.company} onChange={(event) => handleAddressChange("company", event.target.value)} />
             </div>
           )}
 
@@ -381,9 +409,7 @@ export default function BestellCockpitPage() {
             <label>Land*</label>
             <select
               value={address.country}
-              onChange={(event) =>
-                handleAddressChange("country", event.target.value as "de" | "at", { validate: true })
-              }
+              onChange={(event) => handleAddressChange("country", event.target.value as "de" | "at", { validate: true })}
             >
               <option value="de">Deutschland</option>
               <option value="at">Österreich</option>
