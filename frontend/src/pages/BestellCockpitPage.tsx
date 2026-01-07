@@ -42,7 +42,10 @@ export default function BestellCockpitPage() {
   const [products, setProducts] = useState<Product[]>([]);
   const [selectedProductId, setSelectedProductId] = useState<string>("");
   const [quantity, setQuantity] = useState(1);
+
+  // react-select: Text im Suchfeld
   const [selectInputValue, setSelectInputValue] = useState("");
+
   const [loadingProducts, setLoadingProducts] = useState(true);
   const [productsError, setProductsError] = useState<string | null>(null);
 
@@ -99,11 +102,6 @@ export default function BestellCockpitPage() {
         description: product.description,
       })),
     [products]
-  );
-
-  const selectedOption = useMemo(
-    () => productOptions.find((o) => o.value === selectedProductId) ?? null,
-    [productOptions, selectedProductId]
   );
 
   const selectedProduct = useMemo(
@@ -210,31 +208,33 @@ export default function BestellCockpitPage() {
         </div>
       </header>
 
+      {/* Produktsuche */}
       <section className="cockpit-panel">
         <div className="cockpit-panel__header">
           <h4>Produktsuche</h4>
         </div>
+
         <div className="cockpit-select">
           <label htmlFor="cockpit-select">EAN · SKU · Name</label>
+
+          {/* WICHTIG: value={null} + controlShouldRenderValue={false} => Feld bleibt leer */}
           <Select
             inputId="cockpit-select"
             classNamePrefix="rs"
             options={productOptions}
             isSearchable
-            placeholder="Produkt auswählen…"
-            value={selectedOption}
+            placeholder="Produkt suchen…"
+            value={null}
+            controlShouldRenderValue={false}
             inputValue={selectInputValue}
             onInputChange={(value, { action }) => {
-              if (action === "input-change") {
-                setSelectInputValue(value);
-              } else if (action === "menu-close") {
-                setSelectInputValue("");
-              }
+              if (action === "input-change") setSelectInputValue(value);
+              if (action === "menu-close") setSelectInputValue("");
             }}
             onChange={(option: SingleValue<ProductOption>) => {
               if (option) {
                 setSelectedProductId(option.value);
-                setSelectInputValue("");
+                setSelectInputValue(""); // nach Auswahl wieder leer
               }
             }}
             filterOption={(option, inputValue) => {
@@ -258,13 +258,32 @@ export default function BestellCockpitPage() {
                 <strong>{option.price.toFixed(2)} €</strong>
               </div>
             )}
-            components={{
-              IndicatorSeparator: () => null,
-            }}
+            components={{ IndicatorSeparator: () => null }}
           />
+
+          {/* Karte direkt unter der Suche */}
+          <div className="cockpit-selected-card" style={{ marginTop: 12 }}>
+            <img
+              src={selectedProduct.image}
+              alt=""
+              aria-hidden="true"
+              style={{ width: 52, height: 52, objectFit: "cover", borderRadius: 10 }}
+            />
+            <div style={{ minWidth: 0 }}>
+              <p style={{ margin: 0, fontWeight: 700 }}>{selectedProduct.title}</p>
+              <p style={{ margin: "4px 0", opacity: 0.8 }}>
+                SKU {selectedProduct.sku} · EAN {selectedProduct.ean}
+              </p>
+              <p style={{ margin: 0, opacity: 0.8, overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap" }}>
+                {selectedProduct.description}
+              </p>
+            </div>
+            <strong style={{ whiteSpace: "nowrap" }}>{selectedProduct.price.toFixed(2)} €</strong>
+          </div>
         </div>
       </section>
 
+      {/* Produkt + Kosten */}
       <section className="cockpit-panel cockpit-layout">
         <div className="cockpit-product">
           <div className="cockpit-panel__header">
@@ -315,6 +334,7 @@ export default function BestellCockpitPage() {
         </div>
       </section>
 
+      {/* Adresse */}
       <section className="cockpit-panel cockpit-address">
         <div className="cockpit-panel__header">
           <h4>Adresse</h4>
@@ -440,6 +460,7 @@ export default function BestellCockpitPage() {
         </div>
       </section>
 
+      {/* Bestellung */}
       <section className="cockpit-panel cockpit-submit">
         <div className="cockpit-panel__header">
           <h4>Bestellung</h4>
