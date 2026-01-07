@@ -42,16 +42,16 @@ export default function BestellCockpitPage() {
   const [selectedProduct, setSelectedProduct] = useState<Product | null>(null);
   const [quantity, setQuantity] = useState(1);
 
-  // react-select (nur Suchtext)
+  // react-select: Suchtext (nur Tippen)
   const [selectInputValue, setSelectInputValue] = useState("");
 
-  // Dropdown Optionen + Pagination
+  // Dropdown-Optionen + Pagination
   const [options, setOptions] = useState<ProductOption[]>([]);
   const [nextCursor, setNextCursor] = useState<string | null>(null);
   const [hasNextPage, setHasNextPage] = useState(false);
   const [loadingOptions, setLoadingOptions] = useState(false);
 
-  // Start: initiales Default-Produkt laden (optional)
+  // Initiales Produkt laden (optional)
   const [loadingProducts, setLoadingProducts] = useState(true);
   const [productsError, setProductsError] = useState<string | null>(null);
 
@@ -73,7 +73,7 @@ export default function BestellCockpitPage() {
     {} as Record<keyof Address, string | undefined>
   );
 
-  // Initial: ein Produkt zum Anzeigen holen (erste 20 -> nimm erstes)
+  // Start: kleines Default-Produkt laden
   useEffect(() => {
     (async () => {
       try {
@@ -85,7 +85,6 @@ export default function BestellCockpitPage() {
 
         const data = await res.json();
         const items: Product[] = data.items ?? [];
-
         setSelectedProduct(items[0] ?? null);
       } catch (err) {
         setProductsError(err instanceof Error ? err.message : "Unbekannter Fehler");
@@ -203,7 +202,6 @@ export default function BestellCockpitPage() {
     alert("Bestellung gesendet (Demo)");
   };
 
-  // UI States
   if (loadingProducts) return <div style={{ padding: 24 }}>Lade Produkte…</div>;
   if (productsError) {
     return (
@@ -228,6 +226,7 @@ export default function BestellCockpitPage() {
         </div>
       </header>
 
+      {/* Produktsuche */}
       <section className="cockpit-panel">
         <div className="cockpit-panel__header">
           <h4>Produktsuche</h4>
@@ -261,7 +260,6 @@ export default function BestellCockpitPage() {
             }}
             onChange={(option: SingleValue<ProductOption>) => {
               if (option) {
-                // Ausgewähltes Produkt direkt aus Option bauen (keine extra API nötig)
                 setSelectedProduct({
                   id: option.value,
                   title: option.label,
@@ -272,10 +270,10 @@ export default function BestellCockpitPage() {
                   description: option.description,
                 });
                 setQuantity(1);
-                setSelectInputValue(""); // Suchfeld wieder leer
+                setSelectInputValue("");
               }
             }}
-            filterOption={() => true} // Backend macht Suche, nicht react-select
+            filterOption={() => true} // Backend macht Suche
             formatOptionLabel={(option) => (
               <div className="cockpit-select-option">
                 <img src={option.image} alt="" aria-hidden="true" />
@@ -294,11 +292,13 @@ export default function BestellCockpitPage() {
         </div>
       </section>
 
+      {/* Produkt + Kosten */}
       <section className="cockpit-panel cockpit-layout">
         <div className="cockpit-product">
           <div className="cockpit-panel__header">
             <h4>Produkt</h4>
           </div>
+
           <div className="cockpit-product__preview">
             <img src={selectedProduct.image} alt="" className="cockpit-product__image" />
             <div>
@@ -310,18 +310,28 @@ export default function BestellCockpitPage() {
             </div>
           </div>
 
+          {/* ✅ NEU: symmetrisch als 2-Spalten mit Wrapper */}
           <div className="cockpit-product__form">
-            <label htmlFor="cockpit-qty">Menge</label>
-            <input
-              id="cockpit-qty"
-              type="number"
-              min={1}
-              value={quantity}
-              onChange={(event) => setQuantity(Math.max(1, Number(event.target.value)))}
-            />
+            <div className="cockpit-form-item">
+              <label htmlFor="cockpit-qty">Menge</label>
+              <input
+                id="cockpit-qty"
+                type="number"
+                min={1}
+                value={quantity}
+                onChange={(event) => setQuantity(Math.max(1, Number(event.target.value)))}
+              />
+            </div>
 
-            <label htmlFor="cockpit-price">Einzelpreis</label>
-            <input id="cockpit-price" type="text" value={`${selectedProduct.price.toFixed(2)} €`} readOnly />
+            <div className="cockpit-form-item">
+              <label htmlFor="cockpit-price">Einzelpreis</label>
+              <input
+                id="cockpit-price"
+                type="text"
+                value={`${selectedProduct.price.toFixed(2)} €`}
+                readOnly
+              />
+            </div>
           </div>
         </div>
 
@@ -344,9 +354,7 @@ export default function BestellCockpitPage() {
         </div>
       </section>
 
-      {/* Adresse + Bestellung bleibt wie gehabt (du kannst den Rest aus deiner Datei übernehmen) */}
-      {/* --- ab hier unverändert --- */}
-
+      {/* Adresse */}
       <section className="cockpit-panel cockpit-address">
         <div className="cockpit-panel__header">
           <h4>Adresse</h4>
@@ -472,6 +480,7 @@ export default function BestellCockpitPage() {
         </div>
       </section>
 
+      {/* Bestellung */}
       <section className="cockpit-panel cockpit-submit">
         <div className="cockpit-panel__header">
           <h4>Bestellung</h4>
