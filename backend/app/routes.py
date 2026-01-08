@@ -85,10 +85,31 @@ def ensure_auth_tables(conn):
 
 
 def set_session_cookie(resp, token: str):
-    secure = (os.getenv("COOKIE_SECURE") or "").strip().lower() in ("1", "true", "yes", "on")
+    secure = (os.getenv("COOKIE_SECURE") or "").strip().lower() in (
+        "1",
+        "true",
+        "yes",
+        "on",
+        # tolerant (falls jemand DE-Werte setzt)
+        "ja",
+        "treu",
+        "wahr",
+    )
     cookie_samesite = (os.getenv("COOKIE_SAMESITE") or "").strip()
     # Für getrennte Frontend/Backend-Domains (Railway) braucht es oft SameSite=None + Secure
-    samesite = cookie_samesite or ("None" if secure else "Lax")
+    if cookie_samesite:
+        s = cookie_samesite.strip().lower()
+        if s == "none":
+            samesite = "None"
+        elif s == "lax":
+            samesite = "Lax"
+        elif s == "strict":
+            samesite = "Strict"
+        else:
+            # ungewohnter Wert: unverändert durchreichen (kann dann von Werkzeug abgelehnt werden)
+            samesite = cookie_samesite
+    else:
+        samesite = "None" if secure else "Lax"
     max_age = int(timedelta(days=SESSION_TTL_DAYS).total_seconds())
     resp.set_cookie(
         SESSION_COOKIE_NAME,
