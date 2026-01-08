@@ -3,6 +3,7 @@ from decimal import Decimal, ROUND_HALF_UP
 from datetime import timedelta
 import hashlib
 import secrets
+from urllib.parse import urlparse, unquote
 
 import pymysql
 import requests
@@ -25,8 +26,27 @@ def get_conn():
     database = os.getenv("MYSQLDATABASE")
     port = int(os.getenv("MYSQLPORT", "3306"))
 
+    # Fallback: Railway gibt oft nur MYSQL_URL/MYSQL_PUBLIC_URL (oder DATABASE_URL) mit.
     if not all([host, user, password, database]):
-        raise RuntimeError("Missing MYSQLHOST/MYSQLUSER/MYSQLPASSWORD/MYSQLDATABASE (Railway MySQL vars)")
+        url = (os.getenv("MYSQL_URL") or os.getenv("MYSQL_PUBLIC_URL") or os.getenv("DATABASE_URL") or "").strip()
+        if url:
+            # SQLAlchemy-Style URLs tolerieren
+            if url.startswith("mysql+pymysql://"):
+                url = url.replace("mysql+pymysql://", "mysql://", 1)
+            parsed = urlparse(url)
+            if parsed.scheme.startswith("mysql"):
+                host = parsed.hostname or host
+                user = unquote(parsed.username) if parsed.username else user
+                password = unquote(parsed.password) if parsed.password else password
+                db_from_path = (parsed.path or "").lstrip("/")
+                database = db_from_path or database
+                port = parsed.port or port
+
+    if not all([host, user, password, database]):
+        raise RuntimeError(
+            "Missing MySQL connection vars. Provide either MYSQLHOST/MYSQLUSER/MYSQLPASSWORD/MYSQLDATABASE "
+            "or MYSQL_URL/MYSQL_PUBLIC_URL."
+        )
 
     return pymysql.connect(
         host=host,
