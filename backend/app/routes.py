@@ -230,6 +230,20 @@ def require_owner(conn):
     return user, None
 
 
+def require_admin(conn):
+    user, _sid = get_current_user(conn)
+    if not user:
+        return None, (jsonify({"error": "unauthorized"}), 401)
+    if user.get("isOwner"):
+        return user, None
+
+    perms = get_user_permissions(conn, user["id"]) if user.get("departmentId") else []
+    if "admin_panel" not in perms:
+        return None, (jsonify({"error": "forbidden"}), 403)
+
+    return user, None
+
+
 # ----------------------------
 # Shopify (wie bisher)
 # ----------------------------
@@ -691,15 +705,58 @@ def auth_logout():
 def admin_list_departments():
     conn = get_conn()
     try:
-        _user, err = require_owner(conn)
+        _user, err = require_admin(conn)
         if err:
             return err
 
         with conn.cursor() as cur:
-            cur.execute("SELECT id, name, created_at FROM departments ORDER BY name")
+            cur.execute(
+                """
+                SELECT d.id, d.name, d.created_at, COUNT(u.id) AS user_count
+                FROM departments d
+                LEFT JOIN users u ON u.department_id = d.id
+                GROUP BY d.id, d.name, d.created_at
+                ORDER BY d.name
+                """
+            )
             rows = cur.fetchall() or []
         conn.commit()
         return jsonify({"items": rows}), 200
+    except Exception as e:
+        conn.rollback()
+        return jsonify({"error": "internal_error", "detail": str(e)}), 500
+    finally:
+        conn.close()
+
+
+@api_bp.post("/admin/departments")
+def admin_create_department():
+    conn = get_conn()
+    try:
+        _user, err = require_admin(conn)
+        if err:
+            return err
+
+        payload = request.get_json(silent=True) or {}
+        try:
+            name = require_field(payload, "name")
+        except ValueError as e:
+            return jsonify({"error": "bad_request", "detail": str(e)}), 400
+
+        if not (2 <= len(name) <= 100):
+            return jsonify({"error": "bad_request", "detail": "name must be 2-100 chars"}), 400
+
+        with conn.cursor() as cur:
+            cur.execute("INSERT INTO departments (name) VALUES (%s)", (name,))
+            dep_id = cur.lastrowid
+            cur.execute("SELECT id, name, created_at FROM departments WHERE id=%s LIMIT 1", (dep_id,))
+            dep = cur.fetchone()
+
+        conn.commit()
+        return jsonify({"item": dep}), 201
+    except pymysql.err.IntegrityError:
+        conn.rollback()
+        return jsonify({"error": "department_exists"}), 409
     except Exception as e:
         conn.rollback()
         return jsonify({"error": "internal_error", "detail": str(e)}), 500
@@ -711,7 +768,7 @@ def admin_list_departments():
 def admin_list_permissions():
     conn = get_conn()
     try:
-        _user, err = require_owner(conn)
+        _user, err = require_admin(conn)
         if err:
             return err
 
@@ -731,7 +788,7 @@ def admin_list_permissions():
 def admin_get_department_permissions(department_id: int):
     conn = get_conn()
     try:
-        _user, err = require_owner(conn)
+        _user, err = require_admin(conn)
         if err:
             return err
 
@@ -766,7 +823,7 @@ def admin_get_department_permissions(department_id: int):
 def admin_set_department_permissions(department_id: int):
     conn = get_conn()
     try:
-        _user, err = require_owner(conn)
+        _user, err = require_admin(conn)
         if err:
             return err
 
@@ -816,7 +873,7 @@ def admin_list_users():
     conn = get_conn()
     try:
         ensure_auth_tables(conn)
-        _user, err = require_owner(conn)
+        _user, err = require_admin(conn)
         if err:
             return err
 
@@ -850,11 +907,95 @@ def admin_list_users():
         conn.close()
 
 
+@api_bp.post("/admin/users")
+def admin_create_user():
+    conn = get_conn()
+    try:
+        ensure_auth_tables(conn)
+        _user, err = require_admin(conn)
+        if err:
+            return err
+
+        payload = request.get_json(silent=True) or {}
+        try:
+            email = normalize_email(require_field(payload, "email"))
+        except ValueError as e:
+            return jsonify({"error": "bad_request", "detail": str(e)}), 400
+
+        first_name = (payload.get("firstName") or "").strip() or None
+        last_name = (payload.get("lastName") or "").strip() or None
+        department_id = payload.get("departmentId")
+        department_id = int(department_id) if department_id not in (None, "", 0, "0") else None
+
+        is_owner = 1 if str(payload.get("isOwner") or "").strip().lower() in ("1", "true", "yes", "on", "ja") else 0
+        is_active = 0 if str(payload.get("isActive") or "true").strip().lower() in ("0", "false", "no", "off", "nein") else 1
+
+        if not email or "@" not in email or len(email) > 255:
+            return jsonify({"error": "email_invalid"}), 400
+
+        provided_password = (payload.get("password") or "").strip()
+        generated_password = None
+        if provided_password:
+            new_password = provided_password
+        else:
+            generated_password = secrets.token_urlsafe(10)
+            new_password = generated_password
+
+        if not (6 <= len(new_password) <= 128):
+            return jsonify({"error": "password_policy"}), 400
+
+        if department_id is not None:
+            with conn.cursor() as cur:
+                cur.execute("SELECT id FROM departments WHERE id=%s LIMIT 1", (department_id,))
+                if not cur.fetchone():
+                    return jsonify({"error": "bad_request", "detail": "Unknown departmentId"}), 400
+
+        pw_hash = bcrypt.hashpw(new_password.encode("utf-8"), bcrypt.gensalt()).decode("utf-8")
+
+        with conn.cursor() as cur:
+            cur.execute(
+                """
+                INSERT INTO users (email, password_hash, first_name, last_name, department_id, is_owner, is_active)
+                VALUES (%s, %s, %s, %s, %s, %s, %s)
+                """,
+                (email, pw_hash, first_name, last_name, department_id, is_owner, is_active),
+            )
+            user_id = cur.lastrowid
+
+            cur.execute(
+                """
+                SELECT
+                  u.id, u.email, u.first_name, u.last_name,
+                  u.department_id, d.name AS department_name,
+                  u.is_owner, u.is_active,
+                  u.created_at, u.last_login_at,
+                  0 AS active_sessions
+                FROM users u
+                LEFT JOIN departments d ON d.id = u.department_id
+                WHERE u.id = %s
+                LIMIT 1
+                """,
+                (user_id,),
+            )
+            user_row = cur.fetchone()
+
+        conn.commit()
+        return jsonify({"item": user_row, "temporaryPassword": generated_password}), 201
+    except pymysql.err.IntegrityError:
+        conn.rollback()
+        return jsonify({"error": "email_exists"}), 409
+    except Exception as e:
+        conn.rollback()
+        return jsonify({"error": "internal_error", "detail": str(e)}), 500
+    finally:
+        conn.close()
+
+
 @api_bp.post("/admin/users/<int:user_id>/department")
 def admin_set_user_department(user_id: int):
     conn = get_conn()
     try:
-        _user, err = require_owner(conn)
+        _user, err = require_admin(conn)
         if err:
             return err
 
@@ -887,7 +1028,7 @@ def admin_set_user_department(user_id: int):
 def admin_set_user_active(user_id: int):
     conn = get_conn()
     try:
-        _user, err = require_owner(conn)
+        _user, err = require_admin(conn)
         if err:
             return err
 
@@ -920,7 +1061,7 @@ def admin_reset_password(user_id: int):
     conn = get_conn()
     try:
         ensure_auth_tables(conn)
-        _user, err = require_owner(conn)
+        _user, err = require_admin(conn)
         if err:
             return err
 

@@ -238,12 +238,25 @@
   overflow: auto;
 }
 
+.admin-overview .module-grid {
+  margin-top: var(--space-sm);
+}
+
+.admin-form-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: var(--space-md);
+}
+
 @media (max-width: 1100px) {
   .admin-grid {
     grid-template-columns: 1fr;
   }
   .admin-select {
     max-width: 100%;
+  }
+  .admin-form-grid {
+    grid-template-columns: 1fr;
   }
 }
 

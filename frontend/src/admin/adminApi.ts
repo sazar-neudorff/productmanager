@@ -21,7 +21,7 @@ async function requestJson<T>(path: string, init?: RequestInit): Promise<T> {
   return data as T;
 }
 
-export type AdminDepartment = { id: number; name: string; created_at?: string };
+export type AdminDepartment = { id: number; name: string; created_at?: string; user_count?: number };
 export type AdminPermission = { id: number; key_name: string; label: string; created_at?: string };
 
 export type AdminUser = {
@@ -44,6 +44,10 @@ export async function adminListUsers(): Promise<{ items: AdminUser[] }> {
 
 export async function adminListDepartments(): Promise<{ items: AdminDepartment[] }> {
   return await requestJson("/api/admin/departments", { method: "GET" });
+}
+
+export async function adminCreateDepartment(name: string): Promise<{ item: AdminDepartment }> {
+  return await requestJson("/api/admin/departments", { method: "POST", body: JSON.stringify({ name }) });
 }
 
 export async function adminListPermissions(): Promise<{ items: AdminPermission[] }> {
@@ -81,5 +85,17 @@ export async function adminResetUserPassword(
   userId: number
 ): Promise<{ ok: true; temporaryPassword: string | null }> {
   return await requestJson(`/api/admin/users/${userId}/reset-password`, { method: "POST", body: "{}" });
+}
+
+export async function adminCreateUser(input: {
+  email: string;
+  firstName?: string;
+  lastName?: string;
+  departmentId?: number | null;
+  isOwner?: boolean;
+  isActive?: boolean;
+  password?: string;
+}): Promise<{ item: AdminUser; temporaryPassword: string | null }> {
+  return await requestJson("/api/admin/users", { method: "POST", body: JSON.stringify(input) });
 }
 
