@@ -1,11 +1,18 @@
 import os
 from decimal import Decimal, ROUND_HALF_UP
+from datetime import timedelta
+import hashlib
+import secrets
 
 import pymysql
 import requests
+import bcrypt
 from flask import Blueprint, jsonify, request
 
 api_bp = Blueprint("api", __name__)
+
+SESSION_COOKIE_NAME = os.getenv("SESSION_COOKIE_NAME", "np_session")
+SESSION_TTL_DAYS = int(os.getenv("SESSION_TTL_DAYS", "30"))
 
 
 # ----------------------------
@@ -42,6 +49,135 @@ def require_field(obj: dict, name: str) -> str:
     if not val:
         raise ValueError(f"Missing field: {name}")
     return val
+
+
+def normalize_email(email: str) -> str:
+    return (email or "").strip().lower()
+
+
+def token_sha256(token: str) -> str:
+    return hashlib.sha256(token.encode("utf-8")).hexdigest()
+
+
+def ensure_auth_tables(conn):
+    """
+    Lightweight 'migration': stellt sicher, dass die Sessions-Tabelle existiert.
+    (Railway/MySQL: keine Migration-Tooling im Repo)
+    """
+    with conn.cursor() as cur:
+        cur.execute(
+            """
+            CREATE TABLE IF NOT EXISTS user_sessions (
+              id BIGINT AUTO_INCREMENT PRIMARY KEY,
+              user_id INT NOT NULL,
+              token_hash CHAR(64) NOT NULL UNIQUE,
+              created_at DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP,
+              last_seen_at DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP,
+              revoked_at DATETIME NULL,
+              ip VARCHAR(45) NULL,
+              user_agent VARCHAR(255) NULL,
+              CONSTRAINT fk_us_user FOREIGN KEY (user_id) REFERENCES users(id) ON DELETE CASCADE,
+              INDEX idx_us_user (user_id),
+              INDEX idx_us_active (revoked_at, last_seen_at)
+            ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4
+            """
+        )
+
+
+def set_session_cookie(resp, token: str):
+    secure = (os.getenv("COOKIE_SECURE") or "").strip().lower() in ("1", "true", "yes", "on")
+    cookie_samesite = (os.getenv("COOKIE_SAMESITE") or "").strip()
+    # Für getrennte Frontend/Backend-Domains (Railway) braucht es oft SameSite=None + Secure
+    samesite = cookie_samesite or ("None" if secure else "Lax")
+    max_age = int(timedelta(days=SESSION_TTL_DAYS).total_seconds())
+    resp.set_cookie(
+        SESSION_COOKIE_NAME,
+        token,
+        max_age=max_age,
+        httponly=True,
+        secure=secure,
+        samesite=samesite,
+        path="/",
+    )
+    return resp
+
+
+def clear_session_cookie(resp):
+    resp.delete_cookie(SESSION_COOKIE_NAME, path="/")
+    return resp
+
+
+def get_request_meta():
+    ip = (request.headers.get("X-Forwarded-For") or request.remote_addr or "").split(",")[0].strip() or None
+    ua = (request.headers.get("User-Agent") or "").strip()[:255] or None
+    return ip, ua
+
+
+def get_current_user(conn):
+    token = request.cookies.get(SESSION_COOKIE_NAME)
+    if not token:
+        return None, None
+
+    ensure_auth_tables(conn)
+    th = token_sha256(token)
+
+    with conn.cursor() as cur:
+        cur.execute(
+            """
+            SELECT s.id AS session_id, s.user_id, u.email, u.first_name, u.last_name, u.department_id, u.is_owner, u.is_active,
+                   d.name AS department_name
+            FROM user_sessions s
+            JOIN users u ON u.id = s.user_id
+            LEFT JOIN departments d ON d.id = u.department_id
+            WHERE s.token_hash = %s AND s.revoked_at IS NULL
+            LIMIT 1
+            """,
+            (th,),
+        )
+        row = cur.fetchone()
+
+    if not row:
+        return None, None
+
+    if int(row.get("is_active") or 0) != 1:
+        return None, None
+
+    # touch session
+    with conn.cursor() as cur:
+        cur.execute(
+            "UPDATE user_sessions SET last_seen_at = NOW() WHERE id = %s",
+            (row["session_id"],),
+        )
+
+    user = {
+        "id": row["user_id"],
+        "email": row["email"],
+        "firstName": row.get("first_name"),
+        "lastName": row.get("last_name"),
+        "departmentId": row.get("department_id"),
+        "departmentName": row.get("department_name"),
+        "isOwner": bool(row.get("is_owner")),
+        "isActive": bool(row.get("is_active")),
+    }
+
+    return user, row["session_id"]
+
+
+def get_user_permissions(conn, user_id: int) -> list[str]:
+    with conn.cursor() as cur:
+        cur.execute(
+            """
+            SELECT p.key_name
+            FROM users u
+            JOIN department_permissions dp ON dp.department_id = u.department_id
+            JOIN permissions p ON p.id = dp.permission_id
+            WHERE u.id = %s
+            ORDER BY p.key_name
+            """,
+            (user_id,),
+        )
+        rows = cur.fetchall() or []
+    return [r["key_name"] for r in rows if r.get("key_name")]
 
 
 # ----------------------------
@@ -328,5 +464,171 @@ def list_orders():
             rows = cur.fetchall()
 
         return jsonify({"items": rows})
+    finally:
+        conn.close()
+
+
+# ----------------------------
+# Auth (Register/Login/Logout + Sessions in DB)
+# ----------------------------
+@api_bp.get("/auth/me")
+def auth_me():
+    conn = get_conn()
+    try:
+        user, _session_id = get_current_user(conn)
+        if not user:
+            return jsonify({"user": None}), 200
+
+        perms = get_user_permissions(conn, user["id"]) if user.get("departmentId") else []
+        conn.commit()
+        return jsonify({"user": user, "permissions": perms}), 200
+    except Exception as e:
+        conn.rollback()
+        return jsonify({"error": "internal_error", "detail": str(e)}), 500
+    finally:
+        conn.close()
+
+
+@api_bp.post("/auth/register")
+def auth_register():
+    allow = (os.getenv("AUTH_ALLOW_REGISTRATION") or "true").strip().lower() in ("1", "true", "yes", "on")
+    if not allow:
+        return jsonify({"error": "registration_disabled"}), 403
+
+    payload = request.get_json(silent=True) or {}
+    try:
+        email = normalize_email(require_field(payload, "email"))
+        password = require_field(payload, "password")
+        first_name = (payload.get("firstName") or "").strip() or None
+        last_name = (payload.get("lastName") or "").strip() or None
+        department_id = payload.get("departmentId")
+        department_id = int(department_id) if department_id not in (None, "", 0, "0") else None
+
+        if not (6 <= len(password) <= 128):
+            return jsonify({"error": "password_policy", "detail": "Passwort muss 6-128 Zeichen haben."}), 400
+        if not email or "@" not in email:
+            return jsonify({"error": "email_invalid"}), 400
+
+        pw_hash = bcrypt.hashpw(password.encode("utf-8"), bcrypt.gensalt()).decode("utf-8")
+
+        conn = get_conn()
+        try:
+            ensure_auth_tables(conn)
+
+            with conn.cursor() as cur:
+                cur.execute(
+                    """
+                    INSERT INTO users (email, password_hash, first_name, last_name, department_id, is_owner, is_active)
+                    VALUES (%s, %s, %s, %s, %s, 0, 1)
+                    """,
+                    (email, pw_hash, first_name, last_name, department_id),
+                )
+                user_id = cur.lastrowid
+
+            # Auto-login: Session erstellen
+            token = secrets.token_urlsafe(32)
+            th = token_sha256(token)
+            ip, ua = get_request_meta()
+            with conn.cursor() as cur:
+                cur.execute(
+                    """
+                    INSERT INTO user_sessions (user_id, token_hash, ip, user_agent)
+                    VALUES (%s, %s, %s, %s)
+                    """,
+                    (user_id, th, ip, ua),
+                )
+                cur.execute("UPDATE users SET last_login_at = NOW() WHERE id = %s", (user_id,))
+
+            conn.commit()
+
+            resp = jsonify({"ok": True})
+            return set_session_cookie(resp, token), 201
+
+        except pymysql.err.IntegrityError:
+            conn.rollback()
+            return jsonify({"error": "email_exists"}), 409
+        except Exception:
+            conn.rollback()
+            raise
+        finally:
+            conn.close()
+
+    except ValueError as e:
+        return jsonify({"error": "bad_request", "detail": str(e)}), 400
+    except Exception as e:
+        return jsonify({"error": "internal_error", "detail": str(e)}), 500
+
+
+@api_bp.post("/auth/login")
+def auth_login():
+    payload = request.get_json(silent=True) or {}
+    try:
+        email = normalize_email(require_field(payload, "email"))
+        password = require_field(payload, "password")
+
+        conn = get_conn()
+        try:
+            ensure_auth_tables(conn)
+            with conn.cursor() as cur:
+                cur.execute(
+                    """
+                    SELECT id, email, password_hash, is_active
+                    FROM users
+                    WHERE email = %s
+                    LIMIT 1
+                    """,
+                    (email,),
+                )
+                row = cur.fetchone()
+
+            if not row or int(row.get("is_active") or 0) != 1:
+                return jsonify({"error": "invalid_credentials"}), 401
+
+            if not bcrypt.checkpw(password.encode("utf-8"), (row["password_hash"] or "").encode("utf-8")):
+                return jsonify({"error": "invalid_credentials"}), 401
+
+            token = secrets.token_urlsafe(32)
+            th = token_sha256(token)
+            ip, ua = get_request_meta()
+            with conn.cursor() as cur:
+                cur.execute(
+                    """
+                    INSERT INTO user_sessions (user_id, token_hash, ip, user_agent)
+                    VALUES (%s, %s, %s, %s)
+                    """,
+                    (row["id"], th, ip, ua),
+                )
+                cur.execute("UPDATE users SET last_login_at = NOW() WHERE id = %s", (row["id"],))
+            conn.commit()
+
+            resp = jsonify({"ok": True})
+            return set_session_cookie(resp, token), 200
+        except Exception:
+            conn.rollback()
+            raise
+        finally:
+            conn.close()
+
+    except ValueError as e:
+        return jsonify({"error": "bad_request", "detail": str(e)}), 400
+    except Exception as e:
+        return jsonify({"error": "internal_error", "detail": str(e)}), 500
+
+
+@api_bp.post("/auth/logout")
+def auth_logout():
+    conn = get_conn()
+    try:
+        user, session_id = get_current_user(conn)
+        if session_id:
+            with conn.cursor() as cur:
+                cur.execute("UPDATE user_sessions SET revoked_at = NOW() WHERE id = %s", (session_id,))
+            conn.commit()
+
+        resp = jsonify({"ok": True, "user": user})
+        return clear_session_cookie(resp), 200
+    except Exception as e:
+        conn.rollback()
+        return jsonify({"error": "internal_error", "detail": str(e)}), 500
     finally:
         conn.close()

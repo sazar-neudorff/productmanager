@@ -1,4 +1,5 @@
 import "../styles/Sidebar.css";
+import type { AuthUser } from "../auth/authApi";
 
 type SidebarNavItem = {
   id: string;
@@ -10,9 +11,22 @@ interface PortalSidebarProps {
   navigation: SidebarNavItem[];
   activeView: string;
   onNavigate: (id: SidebarNavItem["id"]) => void;
+  currentUser?: AuthUser | null;
+  onLogout?: () => void;
 }
 
-export default function PortalSidebar({ navigation, activeView, onNavigate }: PortalSidebarProps) {
+export default function PortalSidebar({
+  navigation,
+  activeView,
+  onNavigate,
+  currentUser,
+  onLogout,
+}: PortalSidebarProps) {
+  const displayName =
+    [currentUser?.firstName, currentUser?.lastName].filter(Boolean).join(" ") ||
+    currentUser?.email ||
+    null;
+
   return (
     <aside className="portal-sidebar admin-sidebar" aria-label="Seitennavigation">
       <div className="portal-sidebar__brand">
@@ -20,6 +34,11 @@ export default function PortalSidebar({ navigation, activeView, onNavigate }: Po
         <p className="portal-sidebar__tagline">Interne Plattform</p>
         <h2>Produktmanager</h2>
         <p>Module, Exporte und Dateiflüsse in einer Oberfläche.</p>
+        {displayName && (
+          <p style={{ marginTop: "0.75rem", color: "var(--clr-text-subtle)", fontSize: "0.95rem" }}>
+            Angemeldet als <strong>{displayName}</strong>
+          </p>
+        )}
       </div>
 
       <nav className="portal-sidebar__nav" aria-label="Hauptnavigation">
@@ -53,7 +72,7 @@ export default function PortalSidebar({ navigation, activeView, onNavigate }: Po
         </label>
       </div>
 
-      <button type="button" className="portal-sidebar__logout">
+      <button type="button" className="portal-sidebar__logout" onClick={onLogout} disabled={!onLogout}>
         Abmelden
       </button>
     </aside>
