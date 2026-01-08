@@ -1,4 +1,8 @@
 Flask==3.0.3
-gunicorn
-requests
 flask-cors
+python-dotenv
+PyMySQL
+bcrypt
+PyJWT
+requests
+gunicorn
