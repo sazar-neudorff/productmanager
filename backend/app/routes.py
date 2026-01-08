@@ -221,6 +221,15 @@ def get_user_permissions(conn, user_id: int) -> list[str]:
     return [r["key_name"] for r in rows if r.get("key_name")]
 
 
+def require_owner(conn):
+    user, _sid = get_current_user(conn)
+    if not user:
+        return None, (jsonify({"error": "unauthorized"}), 401)
+    if not user.get("isOwner"):
+        return None, (jsonify({"error": "forbidden"}), 403)
+    return user, None
+
+
 # ----------------------------
 # Shopify (wie bisher)
 # ----------------------------
@@ -668,6 +677,277 @@ def auth_logout():
 
         resp = jsonify({"ok": True, "user": user})
         return clear_session_cookie(resp), 200
+    except Exception as e:
+        conn.rollback()
+        return jsonify({"error": "internal_error", "detail": str(e)}), 500
+    finally:
+        conn.close()
+
+
+# ----------------------------
+# Admin (Owner-only): Users / Departments / Permissions
+# ----------------------------
+@api_bp.get("/admin/departments")
+def admin_list_departments():
+    conn = get_conn()
+    try:
+        _user, err = require_owner(conn)
+        if err:
+            return err
+
+        with conn.cursor() as cur:
+            cur.execute("SELECT id, name, created_at FROM departments ORDER BY name")
+            rows = cur.fetchall() or []
+        conn.commit()
+        return jsonify({"items": rows}), 200
+    except Exception as e:
+        conn.rollback()
+        return jsonify({"error": "internal_error", "detail": str(e)}), 500
+    finally:
+        conn.close()
+
+
+@api_bp.get("/admin/permissions")
+def admin_list_permissions():
+    conn = get_conn()
+    try:
+        _user, err = require_owner(conn)
+        if err:
+            return err
+
+        with conn.cursor() as cur:
+            cur.execute("SELECT id, key_name, label, created_at FROM permissions ORDER BY key_name")
+            rows = cur.fetchall() or []
+        conn.commit()
+        return jsonify({"items": rows}), 200
+    except Exception as e:
+        conn.rollback()
+        return jsonify({"error": "internal_error", "detail": str(e)}), 500
+    finally:
+        conn.close()
+
+
+@api_bp.get("/admin/departments/<int:department_id>/permissions")
+def admin_get_department_permissions(department_id: int):
+    conn = get_conn()
+    try:
+        _user, err = require_owner(conn)
+        if err:
+            return err
+
+        with conn.cursor() as cur:
+            cur.execute("SELECT id, name FROM departments WHERE id=%s LIMIT 1", (department_id,))
+            dep = cur.fetchone()
+            if not dep:
+                return jsonify({"error": "not_found"}), 404
+
+            cur.execute(
+                """
+                SELECT p.key_name, p.label
+                FROM department_permissions dp
+                JOIN permissions p ON p.id = dp.permission_id
+                WHERE dp.department_id = %s
+                ORDER BY p.key_name
+                """,
+                (department_id,),
+            )
+            perms = cur.fetchall() or []
+
+        conn.commit()
+        return jsonify({"department": dep, "permissions": perms}), 200
+    except Exception as e:
+        conn.rollback()
+        return jsonify({"error": "internal_error", "detail": str(e)}), 500
+    finally:
+        conn.close()
+
+
+@api_bp.post("/admin/departments/<int:department_id>/permissions")
+def admin_set_department_permissions(department_id: int):
+    conn = get_conn()
+    try:
+        _user, err = require_owner(conn)
+        if err:
+            return err
+
+        payload = request.get_json(silent=True) or {}
+        keys = payload.get("permissionKeys")
+        if not isinstance(keys, list):
+            return jsonify({"error": "bad_request", "detail": "permissionKeys must be an array"}), 400
+
+        keys = [str(k).strip() for k in keys if str(k).strip()]
+
+        with conn.cursor() as cur:
+            cur.execute("SELECT id FROM departments WHERE id=%s LIMIT 1", (department_id,))
+            if not cur.fetchone():
+                return jsonify({"error": "not_found"}), 404
+
+            if keys:
+                placeholders = ",".join(["%s"] * len(keys))
+                cur.execute(f"SELECT id, key_name FROM permissions WHERE key_name IN ({placeholders})", tuple(keys))
+                perm_rows = cur.fetchall() or []
+                key_to_id = {r["key_name"]: r["id"] for r in perm_rows}
+                missing = [k for k in keys if k not in key_to_id]
+                if missing:
+                    return jsonify({"error": "bad_request", "detail": f"Unknown permission keys: {missing}"}), 400
+                perm_ids = [key_to_id[k] for k in keys]
+            else:
+                perm_ids = []
+
+            # replace set
+            cur.execute("DELETE FROM department_permissions WHERE department_id=%s", (department_id,))
+            if perm_ids:
+                cur.executemany(
+                    "INSERT INTO department_permissions (department_id, permission_id) VALUES (%s, %s)",
+                    [(department_id, pid) for pid in perm_ids],
+                )
+
+        conn.commit()
+        return jsonify({"ok": True}), 200
+    except Exception as e:
+        conn.rollback()
+        return jsonify({"error": "internal_error", "detail": str(e)}), 500
+    finally:
+        conn.close()
+
+
+@api_bp.get("/admin/users")
+def admin_list_users():
+    conn = get_conn()
+    try:
+        ensure_auth_tables(conn)
+        _user, err = require_owner(conn)
+        if err:
+            return err
+
+        with conn.cursor() as cur:
+            cur.execute(
+                """
+                SELECT
+                  u.id, u.email, u.first_name, u.last_name,
+                  u.department_id, d.name AS department_name,
+                  u.is_owner, u.is_active,
+                  u.created_at, u.last_login_at,
+                  (
+                    SELECT COUNT(*)
+                    FROM user_sessions s
+                    WHERE s.user_id = u.id AND s.revoked_at IS NULL
+                  ) AS active_sessions
+                FROM users u
+                LEFT JOIN departments d ON d.id = u.department_id
+                ORDER BY u.id DESC
+                LIMIT 500
+                """
+            )
+            rows = cur.fetchall() or []
+
+        conn.commit()
+        return jsonify({"items": rows}), 200
+    except Exception as e:
+        conn.rollback()
+        return jsonify({"error": "internal_error", "detail": str(e)}), 500
+    finally:
+        conn.close()
+
+
+@api_bp.post("/admin/users/<int:user_id>/department")
+def admin_set_user_department(user_id: int):
+    conn = get_conn()
+    try:
+        _user, err = require_owner(conn)
+        if err:
+            return err
+
+        payload = request.get_json(silent=True) or {}
+        department_id = payload.get("departmentId")
+        department_id = int(department_id) if department_id not in (None, "", 0, "0") else None
+
+        with conn.cursor() as cur:
+            cur.execute("SELECT id FROM users WHERE id=%s LIMIT 1", (user_id,))
+            if not cur.fetchone():
+                return jsonify({"error": "not_found"}), 404
+
+            if department_id is not None:
+                cur.execute("SELECT id FROM departments WHERE id=%s LIMIT 1", (department_id,))
+                if not cur.fetchone():
+                    return jsonify({"error": "bad_request", "detail": "Unknown departmentId"}), 400
+
+            cur.execute("UPDATE users SET department_id=%s WHERE id=%s", (department_id, user_id))
+
+        conn.commit()
+        return jsonify({"ok": True}), 200
+    except Exception as e:
+        conn.rollback()
+        return jsonify({"error": "internal_error", "detail": str(e)}), 500
+    finally:
+        conn.close()
+
+
+@api_bp.post("/admin/users/<int:user_id>/active")
+def admin_set_user_active(user_id: int):
+    conn = get_conn()
+    try:
+        _user, err = require_owner(conn)
+        if err:
+            return err
+
+        payload = request.get_json(silent=True) or {}
+        is_active = payload.get("isActive")
+        is_active = 1 if str(is_active).strip().lower() in ("1", "true", "yes", "on", "ja") else 0
+
+        with conn.cursor() as cur:
+            cur.execute("SELECT id FROM users WHERE id=%s LIMIT 1", (user_id,))
+            if not cur.fetchone():
+                return jsonify({"error": "not_found"}), 404
+
+            cur.execute("UPDATE users SET is_active=%s WHERE id=%s", (is_active, user_id))
+            if is_active == 0:
+                # revoke sessions if user is disabled
+                ensure_auth_tables(conn)
+                cur.execute("UPDATE user_sessions SET revoked_at = NOW() WHERE user_id=%s AND revoked_at IS NULL", (user_id,))
+
+        conn.commit()
+        return jsonify({"ok": True}), 200
+    except Exception as e:
+        conn.rollback()
+        return jsonify({"error": "internal_error", "detail": str(e)}), 500
+    finally:
+        conn.close()
+
+
+@api_bp.post("/admin/users/<int:user_id>/reset-password")
+def admin_reset_password(user_id: int):
+    conn = get_conn()
+    try:
+        ensure_auth_tables(conn)
+        _user, err = require_owner(conn)
+        if err:
+            return err
+
+        payload = request.get_json(silent=True) or {}
+        provided = (payload.get("password") or "").strip()
+        if provided:
+            new_password = provided
+        else:
+            # einmalig anzeigen – danach nur noch Hash in DB
+            new_password = secrets.token_urlsafe(10)
+
+        if not (6 <= len(new_password) <= 128):
+            return jsonify({"error": "password_policy"}), 400
+
+        pw_hash = bcrypt.hashpw(new_password.encode("utf-8"), bcrypt.gensalt()).decode("utf-8")
+
+        with conn.cursor() as cur:
+            cur.execute("SELECT id FROM users WHERE id=%s LIMIT 1", (user_id,))
+            if not cur.fetchone():
+                return jsonify({"error": "not_found"}), 404
+
+            cur.execute("UPDATE users SET password_hash=%s WHERE id=%s", (pw_hash, user_id))
+            # revoke sessions (force re-login)
+            cur.execute("UPDATE user_sessions SET revoked_at = NOW() WHERE user_id=%s AND revoked_at IS NULL", (user_id,))
+
+        conn.commit()
+        return jsonify({"ok": True, "temporaryPassword": new_password if not provided else None}), 200
     except Exception as e:
         conn.rollback()
         return jsonify({"error": "internal_error", "detail": str(e)}), 500
