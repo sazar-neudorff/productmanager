@@ -648,7 +648,25 @@ def auth_login():
             if not row or int(row.get("is_active") or 0) != 1:
                 return jsonify({"error": "invalid_credentials"}), 401
 
-            if not bcrypt.checkpw(password.encode("utf-8"), (row["password_hash"] or "").encode("utf-8")):
+            stored_hash = (row.get("password_hash") or "").strip()
+
+            # bcrypt kann ValueError werfen (z.B. "Invalid salt") wenn der Hash nicht im bcrypt-Format ist.
+            # Für Migration/Altbestände: wenn kein bcrypt-Hash, behandeln wir stored_hash als (Legacy) Plaintext
+            # und migrieren bei erfolgreichem Login auf bcrypt.
+            ok = False
+            try:
+                ok = bcrypt.checkpw(password.encode("utf-8"), stored_hash.encode("utf-8"))
+            except ValueError:
+                if stored_hash and not stored_hash.startswith("$2"):
+                    ok = password == stored_hash
+                    if ok:
+                        new_hash = bcrypt.hashpw(password.encode("utf-8"), bcrypt.gensalt()).decode("utf-8")
+                        with conn.cursor() as cur:
+                            cur.execute("UPDATE users SET password_hash=%s WHERE id=%s", (new_hash, row["id"]))
+                else:
+                    ok = False
+
+            if not ok:
                 return jsonify({"error": "invalid_credentials"}), 401
 
             token = secrets.token_urlsafe(32)
